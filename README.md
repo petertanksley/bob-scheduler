@@ -78,9 +78,11 @@ Bob does not sync anything itself. It reads whatever is at those paths.
 
 `/bob remind` and `/bob event` can also create real Reminders and Calendar entries through `osascript`. On other systems Bob skips that step and still writes to `notes.md` and `calendar.md`.
 
-## Persona
+## Persona, and the name
 
-The agent opens with a short, clearly marked persona block: Bob, a smug spirit of intellect who resents being demoted to project management. Delete the block between the `PERSONA` comments in `agents/bob.md` for a neutral voice, or rewrite it. Nothing below it depends on it.
+Bob is named for Bob the Skull from Jim Butcher's *Dresden Files*: a centuries-old spirit of intellect who lives in a skull on a wizard's workbench, knows more than anyone in the room, and never lets you forget it. The scheduler was designed around that voice from the start. A sarcastic, witty, ferociously organized advisor who complains about the assignment and then does it better than you would have is, it turns out, a good shape for something whose whole job is telling you what you are neglecting.
+
+That voice lives in a short, clearly marked block at the top of `agents/bob.md`, between the `PERSONA` comments. Keep it, rewrite it to a persona of your own, or delete it for a neutral project-manager voice. Nothing below the block depends on it; the priority logic, views, and modes are the same either way.
 
 ## Updating
 
