@@ -1,0 +1,19 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "python3 $HOME/.claude/hooks/friday-bob-reminder.py", "timeout": 5 },
+          { "type": "command", "command": "python3 $HOME/.claude/hooks/bob-notes-reminder.py", "timeout": 5 }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "python3 $HOME/.claude/hooks/bob-session-update.py", "timeout": 5 }
+        ]
+      }
+    ]
+  }
+}
