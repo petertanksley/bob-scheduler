@@ -1,4 +1,5 @@
 ---
+card_schema: bob/2
 project: [Project Display Name]
 type: exploratory
 status: active

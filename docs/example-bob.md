@@ -1,4 +1,5 @@
 ---
+card_schema: bob/2
 project: Shift Length and Officer Sleep — Pilot Study
 type: research
 status: active

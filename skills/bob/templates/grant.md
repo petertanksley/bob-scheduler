@@ -1,4 +1,5 @@
 ---
+card_schema: bob/2
 project: [Grant Display Name]
 type: grant
 phase: prospect

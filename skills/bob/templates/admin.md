@@ -1,4 +1,5 @@
 ---
+card_schema: bob/2
 project: [Project Display Name]
 type: admin
 status: active

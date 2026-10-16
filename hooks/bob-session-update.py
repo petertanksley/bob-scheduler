@@ -2,16 +2,19 @@
 """
 Bob Session Update Hook
 
-Fires at session end (Stop event). If the current project has a bob.md,
-emits a one-line reminder to check whether status fields need updating.
-Exits silently if no bob.md is found.
+Fires at session end (Stop event). If the current project has a status card (bob.md, or any card
+tagged `card_schema: bob/...`; see bob_card.py), emits a one-line reminder to check whether status
+fields need updating. On a shared card it points at the user's own section. Exits silently if there
+is no card.
 
 Hook Event: Stop
 """
 
 import os
 import sys
-from pathlib import Path
+
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+import bob_card as bc  # noqa: E402
 
 CYAN = "\033[0;36m"
 NC = "\033[0m"
@@ -21,16 +24,17 @@ def main() -> int:
     project_dir = os.environ.get("CLAUDE_PROJECT_DIR", "")
     if not project_dir:
         return 0
-
-    bob_md = Path(project_dir) / "bob.md"
-    if not bob_md.exists():
+    cards, _ = bc.find_cards(project_dir)
+    if not cards:
         return 0
-
-    print(
-        f"{CYAN}[bob]{NC} This project has a bob.md. "
-        "Before closing, check whether effort_remaining, status, blockers, "
-        "or 'This Week' need updating."
-    )
+    card = cards[0]
+    fm = bc.frontmatter(card) or ""
+    me = bc.identity()
+    if (bc.field(fm, "shared") or "").lower() == "true" and me:
+        where = f"your `## Person: {me}` section and people.{me} fields (leave other people's sections alone)"
+    else:
+        where = "effort_remaining, status, blockers, or 'This Week'"
+    print(f"{CYAN}[bob]{NC} This project has a status card ({card.name}). Before closing, check whether {where} need updating.")
     return 0
 
 
