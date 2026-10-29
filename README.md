@@ -4,6 +4,9 @@ Bob is a `/bob` skill plus an agent that keeps a portfolio of research projects 
 
 Built for an academic workload: grants with phases, papers with venues, data resources, courses, admin, and the one exploratory project that always gets crowded out.
 
+> [!TIP]
+> **New to Bob? Start with the [Quick Start](docs/quick-start.md).** Install, your first fifteen minutes, a working day, shared projects, and how `bob.md` and `CLAUDE.md` divide the work, with diagrams. The rest of this README is the reference.
+
 ## What you get
 
 | Piece | Path | Role |
