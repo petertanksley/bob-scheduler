@@ -1,5 +1,10 @@
 # Changelog
 
+## v2026.10.29: `/bob go`
+
+- **`/bob go <project>`.** Switches projects by starting a fresh session inside the project folder, so its `CLAUDE.md`, memory and history load cleanly. The default copies the launch command for a new VS Code terminal tab; `--window` and `--terminal` open a new VS Code or Terminal.app window. Matcher: `skills/bob/go.R` (base R). macOS only.
+- **Fixed the project-lookup launch line.** It printed `claude <path>`, which sends the path as the first prompt and leaves the session in the current folder. It now prints `cd "<path>" && claude`.
+
 ## v2026.10.16 — shared cards (bob/2)
 
 - **Card format `card_schema: bob/2`.** Cards are found by frontmatter tag, not filename, so a renamed fork of Bob can keep cards under its own name. Untagged legacy cards are still read and get the tag at their next `update`. Spec: `skills/bob/card-spec.md`.

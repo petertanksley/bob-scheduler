@@ -43,13 +43,30 @@ Parse `$ARGUMENTS` and pass the appropriate mode to the bob agent:
 | `event [title] on [date]` | event | Create iCal event + update calendar |
 | `mail` | mail | Read unread mailbox entries across shared projects (marks them seen locally) |
 | `mail send [project] [to] [subject]` | mail | Append one entry to a shared project's `.bob/mail.md` |
+| `go [project]` | go | Open a fresh Claude session inside the project (see **Go** below; no agent) |
 | anything else | project lookup | Treat as project name, surface details + path |
+
+---
+
+## Go
+
+`/bob go [project] [--window | --terminal] [--bare]` switches projects by **launching a new session in the project folder**, so that session loads the project's CLAUDE.md, memory and history from scratch. A `cd` inside the current session cannot do that, and nothing from this session carries over. Handle it here in the main session; do **not** dispatch the bob agent (it is slow and cannot launch anything).
+
+1. Run `Rscript ~/.claude/skills/bob/go.R <project words> [flags]`. It matches the Active sections of both registries (folder name first, then display name) and **copies** `cd <path> && claude "<orientation prompt>"` to the clipboard. The user opens a new terminal in the VS Code terminal panel (`` Ctrl+Shift+` ``; it joins the panel's tab list, on the right), pastes, and presses Enter. Leave `terminal.integrated.defaultLocation` at its default: setting it to `"editor"` opens the new terminal in the editor area, so two sessions show at once. One window, and the new session reads bob.md and gives a five-line pickup. Nothing outside VS Code can open a tab in an existing window, and a Claude panel tab always runs in its window's first folder, so the paste is the one manual step.
+   - `--window`: open the folder in its own VS Code window, wait 4 s, then open `vscode://anthropic.claude-code/open?prompt=…` to start a Claude panel there.
+   - `--terminal`: open a new Terminal.app window running the command.
+   - `--bare`: no orientation prompt.
+2. Exit codes:
+   - `0`: done. Default mode: reply in one line with the project name and "copied: `` Ctrl+Shift+` ``, `Cmd+V`, Enter". With a flag: the project name and that the new window is open. Either way, suggest closing this session (or `/clear` if it is the hub session).
+   - `2`: ambiguous. Stdout lists `name<TAB>path`, one per line. Ask the user which (AskUserQuestion, up to 4 options; if there are more, list them and ask for a more specific name), then rerun with the chosen **absolute path** as the argument.
+   - `1`: no match or missing folder. Print the message and offer `/bob add`.
+3. If `osascript` fails with a "not authorized" error, macOS needs a one-time Automation permission: System Settings > Privacy & Security > Automation > allow the app running Claude (VS Code or Terminal) to control **Terminal**.
 
 ---
 
 ## Dispatch
 
-Dispatch the `bob` agent with the following context:
+For every mode except `go`, dispatch the `bob` agent with the following context:
 
 ```
 Mode: [parsed mode from argument table above]

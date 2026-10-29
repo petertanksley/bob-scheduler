@@ -74,7 +74,16 @@ Solo cards need nothing new beyond the `card_schema: bob/2` tag.
 | `/bob event <title> on <date>` | Calendar entry that blocks planning time. |
 | `/bob mail` | Read unread mailbox entries across shared projects. |
 | `/bob mail send <project> <to> <subject>` | Append one entry to a shared project's mailbox. |
+| `/bob go <project>` | Switch projects: copy a launch command that starts a fresh session inside the project (see below). |
 | `/bob <project name>` | Look up one card. |
+
+### Switching projects with `/bob go`
+
+A Claude Code session is tied to the folder it was launched from: that folder decides which `CLAUDE.md` loads, which memory is used, and where history is saved. A `cd` mid-session does not change any of that, so `/bob go` starts a new session in the project instead. Nothing from the old session carries over.
+
+By default it copies `cd "<project>" && claude "<orient prompt>"` to the clipboard. In VS Code, press `` Ctrl+Shift+` `` for a new terminal, paste, and press Enter: the project session joins the terminal panel's tab list in the same window and opens with a five-line pickup from the card. `--window` opens the project in its own VS Code window with a Claude panel instead; `--terminal` opens a Terminal.app window. `--bare` skips the pickup prompt.
+
+The matcher is `skills/bob/go.R` (base R, so it needs `Rscript` on your PATH). It checks folder names first, then display names, and lists the candidates when a name is ambiguous.
 
 ## Data files
 
@@ -93,6 +102,8 @@ Bob does not sync anything itself. It reads whatever is at those paths.
 ## macOS only, and optional
 
 `/bob remind` and `/bob event` can also create real Reminders and Calendar entries through `osascript`. On other systems Bob skips that step and still writes to `notes.md` and `calendar.md`.
+
+`/bob go` copies with `pbcopy` and its `--window` / `--terminal` options use `open` and `osascript`, so it is macOS-only as written. Elsewhere, take the `Command:` line from `/bob <project>` and run it yourself.
 
 ## Persona, and the name
 

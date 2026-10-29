@@ -373,10 +373,12 @@ Deadline: [date or none] | Effort remaining: [estimate]
 Blockers: [text or none]
 
 Path: [absolute path]
-Command: claude [absolute path]
+Command: cd "[absolute path]" && claude
 ```
 
-Ask: "Want me to open the full bob.md, or is there something specific you need?"
+`claude <path>` is wrong: the argument is sent as the first prompt and the session stays in the current folder. The `cd` form is what makes the session load the project's CLAUDE.md and memory.
+
+Ask: "Want me to open the full bob.md, or is there something specific you need? `/bob go [project]` opens a fresh session there."
 
 ### review: `add` | `done [id]` | (none)
 Manage the peer-review queue (registry entry whose bob.md has `queue: true` and covers reviews; currently `Non_work_work/Journals/reviews/bob.md`).
