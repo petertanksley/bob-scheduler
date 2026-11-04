@@ -84,6 +84,31 @@ Three rules keep them out of each other's way:
 > [!TIP]
 > **A quick test for where a sentence goes.** If it will be wrong next week, it belongs on the card. If it will still be true next year, it belongs in CLAUDE.md. If it is about something that already happened, it belongs in a log.
 
+## Where a project lives, and working across machines
+
+Bob reads files where they are and syncs nothing itself, so where each project lives decides what Bob sees on your second machine and on a teammate's. A project has exactly one of two homes:
+
+| | Synced drive (OneDrive, Dropbox) | Git checkout (GitHub) |
+| --- | --- | --- |
+| Good for | Most research projects; anything on a shared team drive | Code, websites, packages, anything with a public repository |
+| How the card travels | With the folder, as the drive syncs | In commits, like any other file |
+| Register in | `registry.md` (itself synced, so every machine sees the same list) | `registry-local.md` on each machine that has a clone |
+| Before Bob reads it elsewhere | Let the drive finish syncing | `git pull`; a stale clone shows a stale card |
+| What goes wrong | Sync conflict copies; Bob flags them, you resolve them | Forgetting to pull, or to push the card with the work |
+
+> [!WARNING]
+> **Never both.** A git repository inside a syncing folder gets corrupted, because the sync client writes into `.git` while git is working. Keep checkouts outside the synced tree and everything else on the drive.
+
+**Bob's own files.** In `~/.claude/bob/`, four files are yours across machines: put `registry.md`, `calendar.md`, `notes.md` and `future-projects.md` on the synced drive and symlink them into place on each machine. Four stay local on purpose: `identity.md`, `registry-local.md`, `mail-seen.json` and `card-seen.json`. Your Claude Code settings (hooks, the two permission lines) are per machine too, and the installer runs once per machine.
+
+**The routine.**
+
+1. **Leaving a machine:** `/bob update` on anything you touched. Git projects: commit and push (the push gate refuses a push that doesn't carry the card update, so card and work arrive together). Synced projects: give the drive a moment.
+2. **Arriving at the other one:** pull your clones, then `/bob scan`. Any registry path that doesn't exist here shows as MISSING: a clone you haven't made yet, or a local-only project that belongs in this machine's `registry-local.md`. Then `/bob`.
+3. **Paths:** the registries hold absolute paths, so the synced registry works unchanged only when both machines share a username and folder layout; otherwise keep the differing entries in each `registry-local.md`. Shared cards carry no path field, which is what lets one card serve several people's machines.
+
+It works when, on the second machine, `/bob` shows the same projects in the same state you left, with nothing flagged MISSING or as a conflict copy.
+
 ## A working day with Bob
 
 Four commands cover almost everything: plan in the morning, switch into a project, record what changed, plan the week on Friday.

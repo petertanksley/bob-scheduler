@@ -78,6 +78,7 @@
       <li><a href="#first">First fifteen minutes</a></li>
       <li><a href="#card">The card</a></li>
       <li><a href="#files">Three files</a></li>
+      <li><a href="#machines">Across machines</a></li>
       <li><a href="#day">A working day</a></li>
       <li><a href="#daily">What a daily looks like</a></li>
       <li><a href="#shared">Shared projects</a></li>
@@ -213,6 +214,25 @@ blocking_others: "Co-I waiting on the cleaned actigraphy file"
     <li><strong>If a fact matters to both, explain it once.</strong> The full explanation goes in CLAUDE.md, and the card carries a one-line pointer.</li>
   </ol>
   <div class="callout"><strong>A quick test for where a sentence goes.</strong> If it will be wrong next week, it belongs on the card. If it will still be true next year, it belongs in CLAUDE.md. If it is about something that already happened, it belongs in a log.</div>
+
+  <h2 id="machines">Where a project lives, and working across machines</h2>
+  <p>Bob reads files where they are and syncs nothing itself. So where each project lives decides what Bob sees on your second machine, and on a teammate's. There are two kinds of home, and a project has exactly one of them.</p>
+  <div class="scroll"><table>
+    <tr><th></th><th>Synced drive (OneDrive, Dropbox)</th><th>Git checkout (GitHub)</th></tr>
+    <tr><td>Good for</td><td>Most research projects, and anything on a shared team drive</td><td>Code, websites, packages, anything with a public repository</td></tr>
+    <tr><td>How the card travels</td><td>With the folder, as the drive syncs</td><td>In commits, like any other file</td></tr>
+    <tr><td>Register in</td><td><code>registry.md</code>, which is itself synced, so every machine sees the same list</td><td><code>registry-local.md</code> on each machine that has a clone</td></tr>
+    <tr><td>Before Bob reads it on another machine</td><td>Let the drive finish syncing</td><td><code>git pull</code>; a stale clone shows a stale card</td></tr>
+    <tr><td>What can go wrong</td><td>Sync conflict copies (<code>bob (Laptop).md</code>); Bob flags them, you resolve them</td><td>Forgetting to pull, or to push the card with the work</td></tr>
+  </table></div>
+  <div class="callout"><strong>Never both.</strong> A git repository inside a syncing folder gets corrupted, because the sync client writes into <code>.git</code> while git is working. Keep checkouts outside the synced tree (for example <code>~/Documents/GitHub/</code>) and everything else on the drive.</div>
+  <h3>Bob's own files</h3>
+  <p>Bob keeps its data in <code>~/.claude/bob/</code>. Four of those files are yours across machines, so put them on the synced drive and symlink them into place on each machine: <code>registry.md</code>, <code>calendar.md</code>, <code>notes.md</code> and <code>future-projects.md</code>. Four stay local on purpose: <code>identity.md</code>, <code>registry-local.md</code>, and the two read-state files (<code>mail-seen.json</code>, <code>card-seen.json</code>). Your Claude Code settings, including the hooks block and the two permission lines, are also per machine; copy them to each one. The installer itself runs once per machine.</p>
+  <h3>The routine</h3>
+  <div class="step"><div class="n">1</div><div><strong>Leaving a machine.</strong> <code>/bob update</code> on anything you touched. For git projects, commit and push; the push gate hook refuses a push that doesn't carry the card update, so the card and the work arrive together. For synced projects, give the drive a moment to finish.</div></div>
+  <div class="step"><div class="n">2</div><div><strong>Arriving at the other one.</strong> Pull your clones. Then <code>/bob scan</code>: any registry path that doesn't exist on this machine shows as MISSING, which is either a clone you haven't made here yet or a local-only project that belongs in that machine's <code>registry-local.md</code>. Then <code>/bob</code>.</div></div>
+  <div class="step"><div class="n">3</div><div><strong>Paths.</strong> The registries hold absolute paths, so the synced registry only works unchanged when both machines use the same username and folder layout. If they differ, keep the differing entries in each machine's <code>registry-local.md</code>. Shared cards carry no path field at all, which is what lets one card serve several people's machines.</div></div>
+  <p>The test that it works: on the second machine, <code>/bob</code> shows the same projects with the same state you left, and nothing is flagged MISSING or as a conflict copy.</p>
 
   <h2 id="day">A working day with Bob</h2>
   <p>Four commands cover almost everything: plan in the morning, switch into a project, record what changed, plan the week on Friday.</p>
