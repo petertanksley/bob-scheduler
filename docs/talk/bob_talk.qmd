@@ -1,0 +1,374 @@
+---
+title: "How many are you carrying?"
+carpe:
+  call-to-action: "Install Bob this week and have three project cards written by Friday morning, then type /bob."
+  allies: "The repository and its Quick Start; the walkthrough page and the one-pager handed out at the end; the presenter, available for a fifteen-minute setup session."
+  audience: "A research team of six to ten, mixed Claude Code experience, all carrying a dozen or more live projects"
+  format: campfire
+  slot-minutes: 10
+  speaker: "The presenter · see plan.md"
+  sources: []
+  constants:
+    - 41    # live projects on the presenter's registry, 2026-11-04
+    - 150   # the card's line budget (card-spec.md)
+    - 34    # days a paused project had gone untouched, from that morning's daily
+    - 5     # minutes to install (Quick Start)
+    - 3     # cards by Friday (the call to action)
+format:
+  revealjs:
+    theme: [default, carpe.scss]
+    css: carpe-fonts.css
+    width: 1280
+    height: 720
+    margin: 0
+    center: false
+    embed-resources: true
+    transition: fade
+    background-transition: fade
+    transition-speed: default
+    controls: false
+    slide-number: false
+    progress: false
+    incremental: false
+---
+
+```{r}
+#| include: false
+carpe <- Sys.getenv("CARPE_SKILL", "~/.claude/skills/carpe-audience")
+source(file.path(carpe, "assets", "theme_carpe.R"))
+source(file.path(carpe, "assets", "carpe_numbers.R"))
+```
+
+## {.big}
+
+<!--
+  Bob, a ten-minute Carpe Audience talk. Plan, stories and cadence: plan.md in this folder.
+  The title slide is the hook (p. 63); this first content slide is the number the hook asks about.
+  Every slide's notes end with the tag line (pp. 40-41, 90). No bullets, no per-slide styling.
+-->
+
+41
+
+::: {.notes}
+Forty-one. That is the number of live projects on my registry this morning, by actual count: grants in three different phases, two papers, a course, four datasets, the website, the admin folder. You are carrying some number like it. Nobody holds that in their head.
+Type: Set the Stage · Story: Hook · Runtime: 20 s est
+:::
+
+## {.medium}
+
+The loud ones eat the week
+
+::: {.notes}
+What happens is that the loud ones, the ones with a date, eat the week, and the quiet ones, the ones that matter most and have no deadline precisely because nobody is forcing them, stop moving. This is ten minutes on one small habit that fixes that, and what it takes to set it up this week. I will not explain how Claude Code works inside; the walkthrough does that.
+Type: Set the Stage · Story: Hook · Runtime: 25 s est
+:::
+
+## {.medium}
+
+bob.md
+
+::: {.notes}
+Every project gets one short Markdown file at its root, called bob.md. Six fields on it decide where the project lands in your day.
+Type: Background · Story: The card · Runtime: 12 s est
+:::
+
+## {.power}
+
+::: {.items}
+[deadline]{.off} [effort]{.off} [weekly hours]{.off} [priority]{.off} [importance]{.off} [blocking]{.off}
+:::
+
+::: {.notes}
+Six fields. Here they are together; then one at a time.
+Type: Background · Story: The card · Runtime: 4 s est
+:::
+
+## {.power}
+
+::: {.items}
+[deadline]{.on} [effort]{.off} [weekly hours]{.off} [priority]{.off} [importance]{.off} [blocking]{.off}
+:::
+
+::: {.notes}
+The deadline.
+Type: Background · Story: The card · Runtime: 2 s est
+:::
+
+## {.power}
+
+::: {.items}
+[deadline]{.off} [effort]{.on} [weekly hours]{.off} [priority]{.off} [importance]{.off} [blocking]{.off}
+:::
+
+::: {.notes}
+The hours left, roughly.
+Type: Background · Story: The card · Runtime: 2 s est
+:::
+
+## {.power}
+
+::: {.items}
+[deadline]{.off} [effort]{.off} [weekly hours]{.on} [priority]{.off} [importance]{.off} [blocking]{.off}
+:::
+
+::: {.notes}
+The hours a week you can give it.
+Type: Background · Story: The card · Runtime: 2 s est
+:::
+
+## {.power}
+
+::: {.items}
+[deadline]{.off} [effort]{.off} [weekly hours]{.off} [priority]{.on} [importance]{.off} [blocking]{.off}
+:::
+
+::: {.notes}
+Priority: what you want worked on now.
+Type: Background · Story: The card · Runtime: 2 s est
+:::
+
+## {.power}
+
+::: {.items}
+[deadline]{.off} [effort]{.off} [weekly hours]{.off} [priority]{.off} [importance]{.on} [blocking]{.off}
+:::
+
+::: {.notes}
+Slow down here. Importance: how much it matters, whether or not anything is due. Set by you, not by any date. Keep this one in mind; it comes back.
+Type: Background · Story: The card · Runtime: 12 s est
+:::
+
+## {.power}
+
+::: {.items}
+[deadline]{.off} [effort]{.off} [weekly hours]{.off} [priority]{.off} [importance]{.off} [blocking]{.on}
+:::
+
+::: {.notes}
+And whether someone is waiting on you. That bumps the project up a level and badges it.
+Type: Background · Story: The card · Runtime: 8 s est
+:::
+
+## {.power}
+
+::: {.items}
+[deadline]{.off} [effort]{.off} [weekly hours]{.off} [priority]{.off} [importance]{.off} [blocking]{.off}
+:::
+
+::: {.notes}
+That is it. Six fields. Under them, three short sections: what you are doing this week, the next milestones, and a note called Start Here Next Session.
+Type: Background · Story: The card · Runtime: 12 s est
+:::
+
+## {.medium}
+
+Start Here Next Session
+
+::: {.notes}
+Start Here Next Session is the first thing your next session reads. Ten lines at most, rewritten every time. It is the handoff from you to the you of tomorrow, or to a teammate.
+Type: Background · Story: The card · Runtime: 15 s est
+:::
+
+## {.big}
+
+150
+
+::: {.notes}
+The card stays under a hundred and fifty lines. It describes the present only. What happened goes into a dated log; how to work in the project goes into the instructions file. Bob prunes it every time it updates one, so it cannot grow into a diary.
+Type: Background · Story: The card · Runtime: 20 s est
+:::
+
+## {.medium}
+
+Not on the card? It didn't happen.
+
+::: {.notes}
+One rule holds everything up: if it is not on the card, it did not happen. A card that is not updated looks exactly like a project that did not move. Everything else in this talk is in service of keeping that one file honest.
+Type: Background · Story: The card · Runtime: 18 s est
+:::
+
+## {.power}
+
+::: {.items}
+[/bob]{.off} [/bob go]{.off} [/bob update]{.off} [/bob weekly]{.off}
+:::
+
+::: {.notes}
+Four commands cover almost everything.
+Type: Transition · Story: The day · Runtime: 4 s est
+:::
+
+## {.power}
+
+::: {.items}
+[/bob]{.on} [/bob go]{.off} [/bob update]{.off} [/bob weekly]{.off}
+:::
+
+::: {.notes}
+In the morning, in a hub session, you type slash bob. It reads every card in under a second and gives you today's hours, what is red, three or four focus tasks, and a line for the important thing nobody is chasing.
+Type: Background · Story: The day · Runtime: 20 s est
+:::
+
+## {.power}
+
+::: {.items}
+[/bob]{.off} [/bob go]{.on} [/bob update]{.off} [/bob weekly]{.off}
+:::
+
+::: {.notes}
+You pick the first project and type slash bob go and its name. That copies a launch line; new terminal tab, paste, enter, and a fresh session opens inside that project with its own instructions and a five-line pickup from its card.
+Type: Background · Story: The day · Runtime: 20 s est
+:::
+
+## {.medium}
+
+A fresh session for every project
+
+::: {.notes}
+Nothing from the last project comes along, which is the point. A session belongs to the folder it started in. Telling one session to go work somewhere else does not load that project's instructions or memory, and the old conversation stays in the room.
+Type: Background · Story: The day · Runtime: 18 s est
+:::
+
+## {.power}
+
+::: {.items}
+[/bob]{.off} [/bob go]{.off} [/bob update]{.on} [/bob weekly]{.off}
+:::
+
+::: {.notes}
+Before you close that tab, slash bob update. Bob writes what changed onto the card and moves the story into a log. Every session, no exceptions; this is the habit.
+Type: Background · Story: The day · Runtime: 15 s est
+:::
+
+## {.power}
+
+::: {.items}
+[/bob]{.off} [/bob go]{.off} [/bob update]{.off} [/bob weekly]{.on}
+:::
+
+::: {.notes}
+And on Friday, slash bob weekly: hours next week, what is red, what has quietly slipped, and two questions about meetings and deadlines it does not know about yet.
+Type: Background · Story: The day · Runtime: 18 s est
+:::
+
+## {.medium}
+
+Urgency is loud
+
+::: {.notes}
+Here is the part I actually care about. Deadline pressure is arithmetic: hours left over hours a week, against weeks to the date. Red, yellow, green. That measures urgency, and urgency is loud.
+Type: Background · Story: Quiet projects · Runtime: 18 s est
+:::
+
+## {.medium}
+
+Importance is a field
+
+::: {.notes}
+Importance is a separate field, set by you, and Bob crosses the two. The project with high importance and no deadline gets surfaced in every briefing, on purpose, and the warning sharpens when it goes stale.
+Type: Background · Story: Quiet projects · Runtime: 18 s est
+:::
+
+## {.quote}
+
+> Important, not urgent. Untouched 34 days. Zero hours a week. Reset?
+
+::: {.notes}
+PAUSE: turn to the screen, read it silently, turn back. This is a line from my own briefing this week, trimmed. That paper feeds a manuscript due in December. Without the line it would have slid to January.
+Type: Background · Story: Quiet projects · Runtime: 25 s est
+:::
+
+## {.medium}
+
+What looks wrong?
+
+::: {.notes}
+Every briefing ends with the same three words: what looks wrong. Bob surfaces; you decide. Move things, defer them, kill them, and the next daily reflects it. It never makes the call for you.
+Type: Background · Story: Quiet projects · Runtime: 18 s est
+:::
+
+## {.medium}
+
+One card per project
+
+::: {.notes}
+Shared projects keep one card, never one per person. The lead is the steward and owns the top of it: phase, deadlines, blockers. Everyone else has their own section and edits only that. Your daily shows your tasks, the project's state, and who is waiting on whom.
+Type: Background · Story: Together · Runtime: 22 s est
+:::
+
+## {.medium}
+
+A mailbox, not an email thread
+
+::: {.notes}
+Notes between people and their assistants go in a mailbox file in the project folder. One line each, append only, and what you have read is tracked on your own machine, so reading never causes a sync conflict.
+Type: Background · Story: Together · Runtime: 18 s est
+:::
+
+## {.medium}
+
+Synced drive or git. Never both.
+
+::: {.notes}
+One rule about where projects live, because it bites on day two. A project is on the synced drive or in a git checkout, never both. A git repository inside a syncing folder gets corrupted, because the sync client writes into it while git is working.
+Type: Background · Story: Together · Runtime: 20 s est
+:::
+
+## {.medium}
+
+Pull, then /bob
+
+::: {.notes}
+The synced registry follows you between machines; a local one lists each machine's clones. Pull your clones before you run the daily, because a stale clone shows a stale card. On the second machine, slash bob scan tells you what is missing here.
+Type: Background · Story: Together · Runtime: 20 s est
+:::
+
+## {.big}
+
+5 [minutes]{.label}
+
+::: {.notes}
+Five minutes to install: clone the repository, run the installer, two lines in your settings file. The one-pager you are getting has them.
+Type: Call to Action · Story: Close · Runtime: 12 s est
+:::
+
+## {.big}
+
+3 [cards]{.label}
+
+::: {.notes}
+Three cards by Friday: open a project, type slash bob add, answer roughly. About ten hours, two a week is plenty. Then the next project. Three is enough for the first daily to mean something.
+Type: Call to Action · Story: Close · Runtime: 15 s est
+:::
+
+## {.medium}
+
+Then type /bob
+
+::: {.notes}
+Then type slash bob. If the daily looks wrong, the card is wrong; fix the card. I will sit with anyone for fifteen minutes to get set up.
+Type: Call to Action · Story: Close · Runtime: 10 s est
+:::
+
+## {.medium}
+
+How many are you carrying?
+
+::: {.notes}
+Callback to the opening. So, back to the number I started with. Each of you has one. Say it to yourself now, and then count how many of those have a card.
+Type: Call to Action · Story: Close · Runtime: 10 s est
+:::
+
+## {.medium}
+
+Three cards by Friday
+
+::: {.notes}
+Three cards by Friday. That is the whole ask.
+Type: Call to Action · Story: Close · Runtime: 5 s est
+:::
+
+```{r}
+#| include: false
+carpe_ledger_write()
+```

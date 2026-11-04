@@ -1,0 +1,139 @@
+/*-- scss:defaults --*/
+
+// Carpe Audience house theme (Keyes 2011, chs. 9-10, 14).
+//   - Black ground, WHITE type, an occasional grey. No colour on type: colour comes only from
+//     photographs (pp. 60, 90). The amber accent exists for chart marks only (theme_carpe.R).
+//   - One condensed sans family, heavy weights, THREE sizes: big, medium, small (p. 47).
+//   - Every layout anchors top-left at a fixed position, so type registers slide to slide
+//     (pp. 60-61, 91). Do not centre slides one at a time; no AutoFit analogues
+//     (.r-fit-text, .smaller, .scrollable, inline font sizes).
+//   - Tight leading: Keyes's PowerPoint 0.8 multiple is about 0.95-1.0 in CSS (pp. 52, 55, 61).
+// Use as:  theme: [default, carpe.scss]   css: carpe-fonts.css   (fonts/ next to the deck)
+
+$font-family-sans-serif: "Barlow Condensed", "Avenir Next Condensed", "Helvetica Neue", Arial, sans-serif;
+$presentation-heading-font: $font-family-sans-serif;
+
+$body-bg: #000000;
+$body-color: #ffffff;
+$presentation-heading-color: #ffffff;
+$link-color: #ffffff;
+$link-color-hover: #ffffff;
+
+// The three sizes (relative to the 40px root).
+$size-big: 6em;
+$size-medium: 1.9em;
+$size-small: 0.55em;
+$grey: #8c8c8c;
+
+$presentation-font-size-root: 40px;
+$presentation-h1-font-size: $size-medium;
+$presentation-h2-font-size: $size-medium;
+$presentation-h3-font-size: $size-medium;
+$presentation-heading-font-weight: 800;
+$presentation-heading-text-transform: none;
+$presentation-heading-letter-spacing: -0.015em;
+$presentation-heading-line-height: 0.95;
+$presentation-line-height: 0.98;
+
+/*-- scss:rules --*/
+
+// @font-face lives in carpe-fonts.css (linked via `css:`) so its relative url() resolves next to the deck.
+
+.reveal { font-weight: 700; font-kerning: normal; font-feature-settings: "kern"; }
+.reveal .slides section { text-align: left; }
+// With `margin: 0` the slide box is the full frame; the type's fixed anchor is this padding.
+.reveal .slides section.slide { padding: 48px 64px !important; box-sizing: border-box; height: 720px; }
+.reveal h1, .reveal h2, .reveal h3 { text-shadow: none; margin: 0 0 0.3em 0; }
+.reveal p { margin: 0 0 0.3em 0; }
+.reveal a { text-decoration: none; }                                  // p. 103: no link underlines
+.reveal .slide-number, .reveal .progress { color: $grey; }
+.reveal .progress span { background: $grey; }
+
+// ---- the three sizes, applied by role ----------------------------------------------
+// medium: claims, headlines, Power List items, quotes
+.reveal .slides section p,
+.reveal .slides section.quote blockquote { font-size: $size-medium; font-weight: 800; line-height: 0.95; letter-spacing: -0.015em; }
+// big: one number or one word
+.reveal .slides section.big p,
+.reveal .slides section .stat { font-size: $size-big; font-weight: 800; line-height: 0.9; letter-spacing: -0.02em;
+                                font-variant-numeric: tabular-nums lining-nums; }   // digits register across a series
+// small: labels, bylines, credits, captions
+.reveal .small, .reveal figcaption, .reveal .credit, .reveal .byline, .reveal .label,
+.reveal .slides section p.label, .reveal .slides section.big p.label {
+  font-size: $size-small; font-weight: 700; color: #cfcfcf; letter-spacing: 0;
+}
+// A label inside a big-number paragraph ("16 [men]{.label}") is sized against the root: 0.55 / 6 em.
+// A label on its own line under a big number is a paragraph of class label: [men]{.label} won't do
+// (CSS cannot see the bare text beside it), so write  ::: {.label} men :::  or  `<p class="label">`.
+.reveal .slides section.big p .label, .reveal .slides section .stat .label { font-size: 0.0917em; }
+.reveal .byline { display: block; margin-top: 0.4em; }
+.reveal .credit { position: absolute; bottom: 0.2em; right: 0.4em; }
+
+// ---- layouts ---------------------------------------------------------------
+// BIG and MEDIUM share the same top-left anchor. QUOTE: longer text allowed; the speaker goes
+// silent while it is up (pp. 44, 100).
+.reveal .slides section.quote blockquote {
+  width: 100%; margin: 0; padding: 0; border: 0; box-shadow: none; background: none; font-style: normal;
+}
+
+// POWER LIST (pp. 63-67): every item stays on screen; the lit item is white, the rest grey.
+// One slide per step; never fragments (p. 91).
+.reveal .slides section.power .items,
+.reveal .slides section.power .items p { display: flex; flex-wrap: wrap; column-gap: 0.6em; row-gap: 0.1em; margin: 0; }
+.reveal .slides section.power .items span { color: $grey; white-space: nowrap; }
+.reveal .slides section.power .items span.on { color: #ffffff; }
+.reveal .slides section .stat { display: block; color: #ffffff; margin-top: 0.1em; }
+
+// CHART: the figure fills the slide under at most a medium headline.
+.reveal .slides section.chart img { display: block; margin: 0; max-height: 600px; }
+
+// SPLIT (p. 75): the photo bleeds to the slide edge across two-thirds; type sits in the free third.
+// The photo is pre-cropped to the two-thirds aspect with carpe_crop(aspect = "split") and set as a
+// non-repeating background anchored left (or right with .flip):
+//   ## {.split background-image="images/x_split.jpg" background-size="auto 100%" background-position="left center" background-repeat="no-repeat"}
+.reveal .slides section.split > *:not(aside) { margin-left: 70%; max-width: 30%; display: block; }
+.reveal .slides section.split.flip > *:not(aside) { margin-left: 0; }
+
+// BLANK (p. 59): nothing on screen, for media; the logo is hidden on it.
+.reveal .slides section.blank > *:not(aside) { display: none; }
+
+// ---- type over photographs (pp. 71, 76-77) --------------------------------------
+// Soft, blurred shadow (never the hard default) on ANY slide with a background image.
+.reveal .slides section[data-background-image] :is(h1, h2, h3, p, span, blockquote) {
+  text-shadow: 0 0 18px rgba(0, 0, 0, 0.9), 0 0 4px rgba(0, 0, 0, 0.8);
+}
+// Put type in the photo's negative space, on the grid. These change the horizontal anchor only;
+// the vertical anchor stays at the top. Prefer a vignette (carpe_vignette() in theme_carpe.R) and
+// background-position over background-opacity, which washes out the deck's only colour.
+.reveal .slides section.right > *:not(aside)       { margin-left: auto; text-align: right; display: block; max-width: 66%; }
+.reveal .slides section.left-half > *:not(aside)   { max-width: 48%; display: block; }
+.reveal .slides section.right-half > *:not(aside)  { max-width: 48%; display: block; margin-left: auto; }
+.reveal .slides section.left-third > *:not(aside)  { max-width: 31%; display: block; }
+.reveal .slides section.right-third > *:not(aside) { max-width: 31%; display: block; margin-left: auto; }
+
+// Thirds overlay for checking composition in screenshots: add class .grid-debug to a slide.
+.reveal .slides section.grid-debug::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 9;
+  background:
+    linear-gradient(to right, transparent calc(33.33% - 1px), rgba(255,0,0,.6) 33.33%, transparent calc(33.33% + 1px),
+                              transparent calc(66.66% - 1px), rgba(255,0,0,.6) 66.66%, transparent calc(66.66% + 1px)),
+    linear-gradient(to bottom, transparent calc(33.33% - 1px), rgba(255,0,0,.6) 33.33%, transparent calc(33.33% + 1px),
+                               transparent calc(66.66% - 1px), rgba(255,0,0,.6) 66.66%, transparent calc(66.66% + 1px));
+}
+
+// Title slide = a hook (p. 63): one medium title, top-left like every other slide, no centring.
+.reveal .slides section.quarto-title-block, .reveal .slides section#title-slide { text-align: left !important; top: 0 !important; padding: 48px 64px !important; box-sizing: border-box; }
+.reveal .slides section#title-slide h1.title { font-size: $size-medium; text-align: left; margin: 0; }
+.reveal .slides section#title-slide :is(.subtitle, .quarto-title-authors, .date) { display: none; }  // speaker & venue go in notes/handout
+
+// BACKUP (sweat-lodge, pp. 103-105): detail slides after the close, reached by link or overview (O),
+// never on the main line. Denser by design: small type, tables allowed; exempt from the word count.
+.reveal .slides section.backup { font-size: 1em; }
+.reveal .slides section.backup h2 { font-size: $size-medium; }
+.reveal .slides section.backup :is(p, li, td, th) { font-size: $size-small; font-weight: 700; line-height: 1.15; letter-spacing: 0; }
+.reveal .slides section.backup table { border-collapse: collapse; margin: 0.4em 0 0 0; }
+.reveal .slides section.backup :is(td, th) { border-bottom: 1px solid #333; padding: 0.25em 0.8em 0.25em 0; text-align: left; color: #e6e6e6; }
+.reveal .slides section.backup th { color: $grey; }
+// Link from a main slide to its backup, and back: tiny, grey, lower right, not counted by the audit.
+.reveal .slides section a.carpe-link { position: absolute; bottom: 0.2em; right: 0.5em; font-size: $size-small; color: #555; font-weight: 700; }
+.reveal .slides section.backup .small { font-size: 1em; color: #bdbdbd; }

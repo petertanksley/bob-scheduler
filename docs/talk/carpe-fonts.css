@@ -1,0 +1,6 @@
+/* Barlow Condensed (SIL OFL 1.1, fonts/OFL.txt). Linked from the deck YAML as  css: carpe-fonts.css
+   so url() resolves relative to the talk folder; embed-resources inlines the files. */
+@font-face { font-family: "Barlow Condensed"; font-weight: 500; src: url("fonts/BarlowCondensed-Medium.ttf") format("truetype"); }
+@font-face { font-family: "Barlow Condensed"; font-weight: 600; src: url("fonts/BarlowCondensed-SemiBold.ttf") format("truetype"); }
+@font-face { font-family: "Barlow Condensed"; font-weight: 700; src: url("fonts/BarlowCondensed-Bold.ttf") format("truetype"); }
+@font-face { font-family: "Barlow Condensed"; font-weight: 800; src: url("fonts/BarlowCondensed-ExtraBold.ttf") format("truetype"); }
