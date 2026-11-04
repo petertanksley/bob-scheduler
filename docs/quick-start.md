@@ -24,7 +24,7 @@ cd bob-scheduler
 Then two settings:
 
 1. **Who you are.** `~/.claude/bob/identity.md` holds two lines, `me: <your first name>` and `agent: bob`. The installer asks for it; Bob asks once if it's missing.
-2. **No permission prompts.** Bob reads cards across all your projects. In `~/.claude/settings.json`, under `permissions`, add the folders your projects live in plus `~/.claude/bob` to `additionalDirectories`. Without it, every card read asks for permission.
+2. **No permission prompts.** Bob reads cards across all your projects. In `~/.claude/settings.json` (your user settings file), under `permissions`, add the folders your projects live in to `additionalDirectories`, and add `"Bash(Rscript ~/.claude/skills/bob/collect.R*)"` to `allow` so Bob's collector script runs without asking. Copy both from `settings.permissions.example.json`. Without them, every card read asks for permission. You need `Rscript` (R) on your PATH.
 
 Start a new Claude session and type `/bob`. An empty registry means it worked.
 

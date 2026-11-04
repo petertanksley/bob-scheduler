@@ -86,6 +86,23 @@ EOF
 
 ## Reading the Portfolio
 
+### Start with the collector
+
+Run the collector once, before anything else, and build the view from its output:
+
+```
+Rscript ~/.claude/skills/bob/collect.R <mode> [query words] [--store]
+```
+
+Modes: `daily`, `weekly`, `monthly`, `grants`, `scan`, `mail`, `lookup <words>`. It reads both registries, finds every card by the rules below, parses the frontmatter (including `people:` on shared cards) and prints one Markdown facts sheet: availability for the window; a table of every project sorted by the Priority Logic below with pressure colour and ratio, days to deadline, parsed effort and weekly hours, staleness and badges (`BLOCKING`, `BLOCKED`, `PAUSED`, `RESUME-PASSED`, `AWARDED-needs-setup`, `REPORT-DUE`, `SHARED`, `QUEUE`, `CONFLICT-COPY`, `UNTRACKED`, `MISSING`, `NO-IMPORTANCE`, `SOFT-TARGET`); the Q2 and Q3 lists for the Eisenhower check; each card's This Week, Start Here and Upcoming Milestones verbatim (your own person section on shared cards); queue rows; cross-person waits; "changed since you last looked"; the unread mail count; calendar events, pending notes and the idea count; and a Data problems list (missing folders, untracked projects, over-budget cards, conflict copies, legacy cards). Under a second for forty cards.
+
+- Pass `--store` on `daily`, `weekly` and `monthly` runs so the shared-card fingerprints are saved for the next "changed since you last looked" line, and on `mail` so the entries it prints are marked read. Never on any other run.
+- Do not re-read cards the sheet already covers. Open a card only when the sheet flags a problem on it, when the user asks about one project, or when you are about to write to it (`update`, `add`, `review`, `mail send`), and then re-read it immediately before the write.
+- If the collector fails (no `Rscript`, a parse error), say so in one line and fall back to the manual procedure below. The sheet is a convenience; the rules in this file are the contract, and the collector implements them.
+- The sheet reports facts. Judgement stays with you: which three things go in Focus, what the Q2 warning says, whether a RED on a paused card matters today.
+
+### Manual procedure (what the collector does, and the fallback)
+
 For each project in the registry:
 1. Locate the project's status card (see Locating the Card below) and read it. The card is usually `[project_path]/bob.md`, but any filename works.
 2. If no card is found, flag as "untracked" and suggest `/bob add`
@@ -131,7 +148,7 @@ When reading a shared card:
 2. Extract the project-level fields, **only** `people.<me>`, and **only** the `## Person: <me>` section.
 3. Extract cross-person waits: lines in other people's `Waiting On / Waited On By` that mention `me`, plus lines in my own that mention someone else. Do not read the rest of other people's sections into any view.
 4. For priority, importance, weekly commitment and effort (and therefore deadline pressure), use `people.<me>` instead of the project-level fields. The same project can be RED for one person and GREEN for another.
-5. Fingerprint the project block and each other person's section (sha1 of the text). Compare against `~/.claude/bob/card-seen.json`, and if anything changed, produce one "changed since you last looked" line naming whose section changed and the gist. Then store the new fingerprints.
+5. Fingerprint the project block and each other person's section (sha1 of the text). Compare against `~/.claude/bob/card-seen.json`, and if anything changed, produce one "changed since you last looked" line naming whose section changed and the gist. Then store the new fingerprints. The collector does the hashing, the comparison and the write (with `--store`; entries carry `hash_version: 2`); you write the line.
 
 
 ---
@@ -354,16 +371,16 @@ Write confirmed answers to Horizon Notes in calendar.md.
 ## Modes
 
 ### daily
-Run the Daily View. Invite reaction.
+Run `collect.R daily --store`, then the Daily View from its sheet. Invite reaction.
 
 ### weekly
-Run the full Weekly View sequence (Steps 1–5). This is the Friday planning conference — don't rush it.
+Run `collect.R weekly --store`, then the full Weekly View sequence (Steps 1–5). This is the Friday planning conference — don't rush it.
 
 ### monthly / quarterly
-Run the Monthly/Quarterly View sequence (Steps 1–4).
+Run `collect.R monthly --store`, then the Monthly/Quarterly View sequence (Steps 1–4).
 
 ### project lookup: `[project-name]`
-Find the best match. Output:
+Run `collect.R lookup <name words>`; it prints every matching card in full (folder name, display name, queue IDs all match) and the launch line. If several match, ask which. Output:
 
 ```
 **[Project Display Name]**
@@ -395,14 +412,14 @@ Entry format, one line each, append-only:
 - YYYY-MM-DD | from: <agent or person key> | to: <comma list, or all> | <subject> | <body>
 ```
 
-- **(none):** For every registered project with `shared: true` and a `.bob/mail.md`, read the entries whose `to:` contains the `me` key, the `agent` name from identity.md, or `all`. Hash each entry line (sha1) and drop the ones already listed for that mailbox in `~/.claude/bob/mail-seen.json`. Print the unread entries grouped by project, newest first, then add their hashes to `mail-seen.json`. **Never write read-state into the shared file.** Reading must not touch the shared folder.
+- **(none):** Run `collect.R mail --store`; it prints the unread entries grouped by project, newest first, and marks them read. What it implements: for every registered project with `shared: true` and a `.bob/mail.md`, read the entries whose `to:` contains the `me` key, the `agent` name from identity.md, or `all`. Hash each entry line (sha1) and drop the ones already listed for that mailbox in `~/.claude/bob/mail-seen.json`. Print the unread entries grouped by project, newest first, then add their hashes to `mail-seen.json`. **Never write read-state into the shared file.** Reading must not touch the shared folder.
 - **`send`:** Ask for anything missing (project, recipients, subject, body). Re-read the mailbox, then append exactly one line at the end. Create `.bob/mail.md` with a one-line header (`# Mailbox — append-only; one line per entry`) if it does not exist. Never edit or reorder existing entries.
 - **Pruning:** only the card's steward prunes the mailbox. Entries older than ~90 days move verbatim to `docs/logs/YYYY-MM-DD_<me>_mail-prune.md`.
 
 Daily shows a one-line unread count. Weekly lists unread subjects.
 
 ### grants
-Run the Grants View. Show the full grant portfolio organized by phase.
+Run `collect.R grants`, then the Grants View. Show the full grant portfolio organized by phase.
 
 ### add
 0. If what's being added is a single peer review (journal or colleague) and a review queue card exists, don't register it. Run `review add` instead.
@@ -480,7 +497,7 @@ Format for each entry in the file:
 ```
 
 ### scan
-Flag all projects where `last_updated` > 7 days ago. Report list. Suggest `/bob update`.
+Run `collect.R scan`; its Scan section lists the stale, over-budget, missing-importance and legacy cards. Flag all projects where `last_updated` > 7 days ago. Report list. Suggest `/bob update`.
 Flag all projects whose bob.md is over the size budget (> 150 lines total, or `## Notes` > 20 lines) as a separate list, with line counts. Suggest `/bob update` — the prune step will bring them back under.
 Also flag all projects missing the `importance` field (absent or `null`) as a separate list. Suggest `/bob update` to backfill — this is the mechanism for bringing pre-existing bob.md files onto the new field over time, not a one-time bulk rewrite.
 

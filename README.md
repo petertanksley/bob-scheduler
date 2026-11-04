@@ -13,6 +13,7 @@ Built for an academic workload: grants with phases, papers with venues, data res
 |-------|------|------|
 | Skill | `skills/bob/SKILL.md` | The `/bob` command. Parses the mode and dispatches the agent. |
 | Agent | `agents/bob.md` | All the logic: priority formula, views, modes, the bob.md contract. |
+| Collector | `skills/bob/collect.R` | Reads every card in one pass and prints the facts sheet the agent builds each view from. Base R, no packages. |
 | Templates | `skills/bob/templates/*.md` | Starter `bob.md` for six project types: research, grant, writing, admin, web, exploratory. |
 | Hooks | `hooks/*.py` | Friday nudge to run `/bob weekly`; deliver due notes at session start; remind to update the card at session end. |
 | Starter data | `bob-starter/*.md` | Blank registry, calendar, notes, and idea backlog. Installed to `~/.claude/bob/` once, never overwritten. |
@@ -30,7 +31,7 @@ cd bob-scheduler
 Then two manual steps:
 
 1. **Hooks.** Merge `settings.hooks.example.json` into `~/.claude/settings.json` (or `settings.local.json`). Hooks are optional. Without them Bob still works; you just lose the Friday nudge and the note delivery.
-2. **Permissions.** Bob reads `bob.md` files across every project you register, so add the parent directories of your projects and `~/.claude/bob` to `permissions.additionalDirectories` in `~/.claude/settings.json`. Otherwise every read prompts.
+2. **Permissions.** Bob reads `bob.md` files across every project you register. In `~/.claude/settings.json` (your user settings, not a project `settings.local.json`, which does not count for the read block outside a git repository) add the parent directories of your projects to `permissions.additionalDirectories`, and add the allow rule `Bash(Rscript ~/.claude/skills/bob/collect.R*)` so the collector runs without a prompt. `settings.permissions.example.json` shows both. Without them every card read prompts, even in auto mode when `blockReadsOutsideWorkingDirectories` is on. `Rscript` (base R) must be on your PATH.
 
 Start a new session and run `/bob add` to register your first project.
 
@@ -62,6 +63,8 @@ When two or more people work on a project, each running their own Bob (or a rena
 Solo cards need nothing new beyond the `card_schema: bob/2` tag.
 
 ## Modes
+
+Every view starts with one run of `skills/bob/collect.R`, which reads all the cards, the calendar, the mailboxes and the read-state files and prints a single facts sheet: availability, every project sorted by deadline pressure with staleness, quadrant and badges, the body sections the view quotes, cross-person waits, unread mail and a list of data problems. The agent writes the view from that sheet and opens an individual card only to fix something or write to it. Forty cards take under a second.
 
 | Command | What happens |
 |---------|--------------|

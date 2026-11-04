@@ -1,5 +1,12 @@
 # Changelog
 
+## v2026.11.04: collector, prompt-free reads
+
+- **`skills/bob/collect.R`.** One base-R script gathers the whole portfolio and prints a facts sheet: every card located and parsed (solo, shared, queue), deadline pressure, staleness, Eisenhower quadrant, line budgets, cross-person waits, "changed since you last looked", unread mail, calendar availability, pending notes and a data-problems list. The agent runs it once per view instead of opening cards one by one: a daily that took 14 shell calls and eight minutes now needs one call that returns in under a second, plus the write-up. `--store` saves the shared-card fingerprints and marks mail read. Modes: `daily`, `weekly`, `monthly`, `grants`, `scan`, `mail`, `lookup <words>`.
+- **Prompt-free reads, documented properly.** The README, Quick Start and installer now say where `additionalDirectories` must live (user `~/.claude/settings.json`; a `settings.local.json` outside a git repository does not count when `blockReadsOutsideWorkingDirectories` is on) and add the narrow allow rule `Bash(Rscript ~/.claude/skills/bob/collect.R*)`, which survives auto mode where blanket rules are dropped. New `settings.permissions.example.json`.
+- Agent and skill instructions: a "Start with the collector" section; each mode names its collector call; the manual procedure stays as the contract and the fallback when `Rscript` is missing.
+- `.gitignore` for `__pycache__`.
+
 ## v2026.10.29: `/bob go`
 
 - **`/bob go <project>`.** Switches projects by starting a fresh session inside the project folder, so its `CLAUDE.md`, memory and history load cleanly. The default copies the launch command for a new VS Code terminal tab; `--window` and `--terminal` open a new VS Code or Terminal.app window. Matcher: `skills/bob/go.R` (base R). macOS only.

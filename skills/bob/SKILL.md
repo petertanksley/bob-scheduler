@@ -24,6 +24,8 @@ The bob agent reads two registry files to discover all projects:
 
 It then reads each project's status card and builds the requested view. The card is usually `bob.md`, but any root-level `.md` tagged `card_schema: bob/2` counts (see `card-spec.md`).
 
+The reading is done by one script, `collect.R` (base R), which the agent runs once per view: it locates and parses every card, computes deadline pressure, staleness, the Eisenhower quadrant, line budgets, cross-person waits, unread mail and calendar availability, and prints a single facts sheet. The agent writes the view from that sheet instead of opening cards one by one.
+
 ## Argument Parsing
 
 Parse `$ARGUMENTS` and pass the appropriate mode to the bob agent:
@@ -80,6 +82,12 @@ Registry files:
 Templates location (for /bob add):
 ~/.claude/skills/bob/templates/
 
+FIRST run the collector, once, and build the view from its facts sheet:
+  Rscript ~/.claude/skills/bob/collect.R <mode> [query words] [--store]
+(--store on daily/weekly/monthly/mail only). Open an individual card only where the
+sheet flags a problem or you are about to write to it. See "Start with the collector"
+in the agent instructions.
+
 Run the appropriate mode as described in the bob agent instructions.
 ```
 
@@ -100,6 +108,7 @@ If both registry files are empty (no projects listed), bob should skip the view 
 - Identity: `~/.claude/bob/identity.md` holds `me: <key>` and `agent: <name>` (default `bob`), local to each install and never inside a project. Bob asks once if it is missing. Mail addressed to the person key, the agent name, or `all` counts as yours
 - Mailbox: `.bob/mail.md` at a shared project's root, append-only; read state is kept locally in `~/.claude/bob/mail-seen.json`
 - The registry is the source of truth for which projects exist; bob.md is the source of truth for their status
+- `Rscript` (base R, no packages) is required for every mode: `collect.R` gathers the portfolio and `go.R` launches sessions. A prompt-free run needs two things in `~/.claude/settings.json`: the project roots under `permissions.additionalDirectories`, and the allow rule `Bash(Rscript ~/.claude/skills/bob/collect.R*)`. The shared `settings.local.json.template` carries both
 - Daily mode is the default when called with no arguments — quick, not a ceremony
 - Daily/weekly/monthly views include an importance-based "don't let this slide" check — high-importance, not-urgent projects get surfaced on purpose so they don't lose out to whatever's merely loud (see the Eisenhower Check in `agents/bob.md`)
 - See `rules/bob-md-vs-claude-md.md` for what belongs in bob.md vs. a project's own CLAUDE.md

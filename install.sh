@@ -60,8 +60,10 @@ Done. Two manual steps remain:
    `git push` that doesn't carry the card update; bypass with BOB_GATE=skip.
 
 2. Permissions. Bob reads bob.md files across every registered project, so add the parent
-   directories of your projects to "permissions.additionalDirectories" in $CLAUDE/settings.json,
-   along with "$CLAUDE/bob". Otherwise every read prompts.
+   directories of your projects to "permissions.additionalDirectories" in $CLAUDE/settings.json
+   (your user settings; a settings.local.json outside a git repo does not count), and add the
+   allow rule "Bash(Rscript ~/.claude/skills/bob/collect.R*)" so the collector runs without a
+   prompt. See settings.permissions.example.json. Rscript (base R) must be on your PATH.
 
 Then start a new Claude Code session and run: /bob add
 MSG

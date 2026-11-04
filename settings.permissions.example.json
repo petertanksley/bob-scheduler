@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "/Users/<you>/Documents/GitHub",
+      "/Users/<you>/Library/CloudStorage/OneDrive-<org>"
+    ],
+    "allow": [
+      "Bash(Rscript ~/.claude/skills/bob/collect.R*)"
+    ]
+  }
+}
