@@ -57,7 +57,7 @@ Done. Two manual steps remain:
 1. Hooks (optional but recommended). Merge settings.hooks.example.json into $CLAUDE/settings.json
    (or settings.local.json). It adds three SessionStart hooks (Friday nudge, note delivery, card +
    mailbox detection), a PreToolUse push gate on Bash, and one Stop hook. The push gate refuses a
-   `git push` that doesn't carry the card update; bypass with BOB_GATE=skip.
+   git push that doesn't carry the card update; bypass with BOB_GATE=skip.
 
 2. Permissions. Bob reads bob.md files across every registered project, so add the parent
    directories of your projects to "permissions.additionalDirectories" in $CLAUDE/settings.json
