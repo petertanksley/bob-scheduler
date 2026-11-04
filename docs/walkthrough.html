@@ -1,0 +1,304 @@
+<title>Bob Walkthrough</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: a single reading column (68ch) with a sticky section rail above it; maroon is the only accent, used for headings, rules and the current command. */
+  :root {
+    --bg: #f7f3ee;
+    --surface: #ffffff;
+    --fg: #221c19;
+    --fg-soft: #5f534c;
+    --rule: #ddd3c9;
+    --accent: #501214;
+    --accent-ink: #ffffff;
+    --tint: #f3e9e4;
+    --code-bg: #efe7df;
+    --font-display: "Bricolage Grotesque", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    --font-body: "Source Sans 3", "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+    --font-mono: "IBM Plex Mono", "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg: #1b1715; --surface: #241f1c; --fg: #ece5de; --fg-soft: #b3a79d; --rule: #3d3430; --accent: #d9a3a5; --accent-ink: #1b1715; --tint: #2d2421; --code-bg: #2e2724; color-scheme: dark; } }
+  :root[data-theme="dark"] {
+    --bg: #1b1715; --surface: #241f1c; --fg: #ece5de; --fg-soft: #b3a79d; --rule: #3d3430; --accent: #d9a3a5; --accent-ink: #1b1715; --tint: #2d2421; --code-bg: #2e2724; color-scheme: dark; }
+
+  body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 17px; line-height: 1.55;
+         padding-block: 0 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .wrap { max-width: 68ch; margin: 0 auto; }
+  h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; line-height: 1.12; margin: 0; }
+  h1 { font-size: clamp(40px, 7vw, 64px); font-weight: 700; color: var(--accent); letter-spacing: -.01em; }
+  h2 { font-size: 28px; font-weight: 700; margin-top: 56px; padding-top: 18px; border-top: 2px solid var(--accent); }
+  h3 { font-size: 20px; font-weight: 700; margin-top: 30px; }
+  p, ul, ol, table, pre, figure { margin: 14px 0 0; }
+  ul, ol { padding-left: 1.3em; } li { margin-top: 6px; } li::marker { color: var(--accent); }
+  a { color: var(--accent); }
+  code { font-family: var(--font-mono); font-size: .86em; background: var(--code-bg); padding: 1px 5px; border-radius: 3px; }
+  pre { font-family: var(--font-mono); font-size: 14px; line-height: 1.45; background: var(--code-bg); padding: 12px 14px; border-left: 3px solid var(--accent); overflow-x: auto; white-space: pre; }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  .hero { padding-block: 48px 8px; }
+  .hero p.lede { font-family: var(--font-display); font-size: 22px; font-weight: 500; line-height: 1.3; max-width: 30ch; margin-top: 14px; }
+  .meta { color: var(--fg-soft); font-size: 15px; margin-top: 12px; }
+  nav.rail { position: sticky; top: env(safe-area-inset-top, 0px); background: var(--bg); border-bottom: 1px solid var(--rule); padding-block: 10px; z-index: 5; margin-top: 24px; }
+  nav.rail ol { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 14px; }
+  nav.rail a { text-decoration: none; color: var(--fg-soft); } nav.rail a:hover, nav.rail a:focus-visible { color: var(--accent); text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; font-size: 15.5px; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 10px 8px 0; border-bottom: 1px solid var(--rule); }
+  th { font-weight: 600; color: var(--fg-soft); font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
+  .scroll { overflow-x: auto; }
+  figure { background: var(--surface); border: 1px solid var(--rule); padding: 10px; }
+  figure img { display: block; width: 100%; height: auto; max-width: 100%; }
+  figcaption { color: var(--fg-soft); font-size: 14px; margin-top: 8px; }
+  .callout { background: var(--tint); border-left: 4px solid var(--accent); padding: 12px 16px; margin-top: 18px; }
+  .callout strong:first-child { color: var(--accent); }
+  .cmd { display: grid; grid-template-columns: minmax(150px, auto) 1fr; gap: 10px 18px; margin-top: 14px; }
+  .cmd code { justify-self: start; }
+  .step { display: grid; grid-template-columns: 36px 1fr; gap: 12px; margin-top: 16px; }
+  .step .n { font-family: var(--font-display); font-weight: 700; color: var(--accent); font-size: 22px; line-height: 1.2; }
+  .sample { font-family: var(--font-mono); font-size: 13.5px; line-height: 1.5; background: var(--surface); border: 1px solid var(--rule); padding: 14px 16px; white-space: pre-wrap; margin-top: 14px; }
+  .sample b { color: var(--accent); font-weight: 600; }
+  .small { color: var(--fg-soft); font-size: 15px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 520px) { .cmd { grid-template-columns: 1fr; gap: 4px 0; } .cmd code { margin-top: 8px; } body { font-size: 16px; } }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <h1>Bob</h1>
+    <p class="lede">A walkthrough: what it is, how to set it up, and how a day with it goes.</p>
+    <p class="meta">For a research team that keeps many projects moving at once. Version v2026.11.04. Source and Quick Start at <a href="https://github.com/petertanksley/bob-scheduler">github.com/petertanksley/bob-scheduler</a>.</p>
+  </header>
+
+  <nav class="rail" aria-label="Sections">
+    <ol>
+      <li><a href="#problem">The problem</a></li>
+      <li><a href="#claude-code">Claude Code in two minutes</a></li>
+      <li><a href="#what">What Bob is</a></li>
+      <li><a href="#install">Install</a></li>
+      <li><a href="#first">First fifteen minutes</a></li>
+      <li><a href="#card">The card</a></li>
+      <li><a href="#files">Three files</a></li>
+      <li><a href="#day">A working day</a></li>
+      <li><a href="#daily">What a daily looks like</a></li>
+      <li><a href="#shared">Shared projects</a></li>
+      <li><a href="#commands">Commands</a></li>
+      <li><a href="#trouble">When something looks wrong</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="problem">The problem it solves</h2>
+  <p>A working researcher carries a dozen or more live things: two grants in different phases, a paper in revision, a course, a shared dataset, three ideas that keep getting pushed, and the admin that never ends. The urgent ones announce themselves. The important ones often don't, and they are the ones that quietly stop moving.</p>
+  <p>Working with Claude Code adds a second problem. Each session starts with no memory of the last one, so every project needs a way to say "here is where we are, start here." Collaborators and their own assistants need the same thing without a meeting.</p>
+  <p>Bob answers both with one small habit: every project keeps a short status card, and one command reads all the cards and plans the day.</p>
+
+  <h2 id="claude-code">Claude Code in two minutes</h2>
+  <p class="small">Skip this if you already run it.</p>
+  <ul>
+    <li><strong>What it is.</strong> Claude, running in your terminal or inside VS Code, with access to the files in the folder you start it in. You describe what you want; it reads, writes and runs things, asking permission for anything consequential. Install and sign-in instructions are at <a href="https://code.claude.com/docs">code.claude.com/docs</a>.</li>
+    <li><strong>A session belongs to a folder.</strong> Whatever folder you launch from decides what the session can see, which memory it has, and which instructions load. Telling a session to "go work in" another folder does not change any of that.</li>
+    <li><strong>CLAUDE.md is standing instructions.</strong> A file by that name at a project's root is read automatically at the start of every session launched there: where the data lives, coding conventions, what not to touch. Every collaborator's Claude follows it.</li>
+    <li><strong>Skills are slash commands.</strong> <code>/bob</code> is a skill. A skill can dispatch an agent, a specialist with its own instructions, to do the work. Bob is one skill, one agent, one R script that reads the cards, and a few small hooks that run at session start and end.</li>
+    <li><strong>Permission prompts.</strong> Claude Code asks before it runs commands or touches files outside the folder it started in. Bob reads files all over your disk, so two settings lines (below) tell it those folders are allowed. Without them it still works; it just asks a lot.</li>
+  </ul>
+
+  <h2 id="what">What Bob is</h2>
+  <p>Bob is a Claude Code skill that keeps all your projects in view and tells you what to work on next. It plans; it never does the research, writes the code or drafts the paper.</p>
+  <p>Each project carries a short status card, <code>bob.md</code>. Bob reads every card, weighs deadlines against the hours you actually have and how much each project matters, and gives you a plan. You do the work, and the card gets updated so tomorrow's plan is right.</p>
+  <figure>
+    <img src="img/how-bob-works.png" alt="How Bob works: registry, status cards, Bob, your plan, work session, and /bob update writing back to the card">
+    <figcaption>Registry to cards to Bob to your plan to a work session; the update writes back to the card, and the calendar feeds Bob your hours.</figcaption>
+  </figure>
+  <div class="callout"><strong>The card is the only thing Bob trusts.</strong> If it isn't on the card, Bob doesn't know it happened. A card that isn't updated looks exactly like a project that didn't move.</div>
+  <h3>What you get</h3>
+  <ul>
+    <li><strong>One view across everything.</strong> Grants with phases, papers, courses, data resources, admin, the exploratory thing: one table, sorted by what will hurt first.</li>
+    <li><strong>Importance is its own field.</strong> Deadline pressure measures urgency. The high-importance project with no deadline is surfaced on purpose in every view, with a sharper warning when it goes stale. Urgency does not get to win by default.</li>
+    <li><strong>Clean project switching.</strong> <code>/bob go</code> starts a fresh session inside the project, so its instructions and memory load and nothing from the last project leaks in.</li>
+    <li><strong>A handoff that survives you.</strong> The card tells a collaborator, or their assistant, where things stand. On shared projects everyone works from one card and passes notes through a mailbox.</li>
+  </ul>
+
+  <h2 id="install">Install (five minutes)</h2>
+  <p>You need Claude Code on a Mac, and R (so <code>Rscript</code> is on your PATH).</p>
+  <pre><code>git clone https://github.com/petertanksley/bob-scheduler.git
+cd bob-scheduler
+./install.sh</code></pre>
+  <p>Then two settings:</p>
+  <div class="step"><div class="n">1</div><div><strong>Who you are.</strong> <code>~/.claude/bob/identity.md</code> holds two lines, <code>me: &lt;your first name&gt;</code> and <code>agent: bob</code>. The installer asks for it; Bob asks once if it's missing.</div></div>
+  <div class="step"><div class="n">2</div><div><strong>No permission prompts.</strong> In <code>~/.claude/settings.json</code> (your user settings file, not a project one), under <code>permissions</code>, add the folders your projects live in to <code>additionalDirectories</code>, and add <code>"Bash(Rscript ~/.claude/skills/bob/collect.R*)"</code> to <code>allow</code> so Bob's collector script runs without asking. Copy both from <code>settings.permissions.example.json</code> in the repo.
+  <pre><code>{
+  "permissions": {
+    "additionalDirectories": [
+      "/Users/&lt;you&gt;/Documents/GitHub",
+      "/Users/&lt;you&gt;/Library/CloudStorage/OneDrive-&lt;org&gt;"
+    ],
+    "allow": ["Bash(Rscript ~/.claude/skills/bob/collect.R*)"]
+  }
+}</code></pre></div></div>
+  <p>Hooks are optional: merge <code>settings.hooks.example.json</code> into the same file for the Friday nudge, note delivery at session start, card detection when you open a project, and a reminder to update the card before you close. Bob works without them.</p>
+  <p>Start a new Claude session and type <code>/bob</code>. An empty registry means it worked.</p>
+
+  <h2 id="first">Your first fifteen minutes</h2>
+  <p>Register two or three real projects, then read your first daily. Bob is only as good as the cards it has.</p>
+  <div class="step"><div class="n">1</div><div><strong>Open Claude in a project folder</strong> and type <code>/bob add</code>. Bob asks a short round of questions: what kind of project it is (research, grant, writing, admin, web or exploratory), the next deadline, how many hours are left, how many hours a week you can give it, its priority and its importance, and whether anyone else works on it.</div></div>
+  <div class="step"><div class="n">2</div><div><strong>Answer roughly.</strong> "About 10 hours, 2 a week" is plenty. Bob writes <code>bob.md</code> at the project root and adds the folder to your registry.</div></div>
+  <div class="step"><div class="n">3</div><div><strong>Repeat</strong> for your other live projects. A shared project that already has a card only needs adding to your registry; don't create a second card.</div></div>
+  <div class="step"><div class="n">4</div><div><strong>Type <code>/bob</code>.</strong> You get today's available hours, anything urgent, three or four focus tasks, and a "don't let this slide" note for the important project nobody is chasing.</div></div>
+  <p>If the daily looks wrong, the card is wrong. Fix the card (<code>/bob update &lt;project&gt;</code>), not the briefing.</p>
+
+  <h2 id="card">The status card</h2>
+  <p>Six fields decide where a project lands in your plan. Keep them honest and the rest takes care of itself.</p>
+  <div class="scroll"><table>
+    <tr><th>Field</th><th>What it means</th><th>Why Bob cares</th></tr>
+    <tr><td><code>deadline</code></td><td>The next date that actually bites</td><td>Sets the clock</td></tr>
+    <tr><td><code>effort_remaining</code></td><td>Hours of work left, a rough guess</td><td>With the deadline and weekly hours, sets red, yellow or green pressure</td></tr>
+    <tr><td><code>weekly_commitment</code></td><td>Hours a week you can give it</td><td>Too few for the work left turns the project red</td></tr>
+    <tr><td><code>priority</code></td><td>How much you want it worked on now</td><td>Your stated ranking</td></tr>
+    <tr><td><code>importance</code></td><td>How much it matters, deadline or not</td><td>Surfaces the quiet project losing out to loud ones</td></tr>
+    <tr><td><code>blocking_others</code></td><td>Someone is waiting on you</td><td>Bumps priority one level and adds a BLOCKING badge</td></tr>
+  </table></div>
+  <p>The pressure colour is a pace check: hours left, divided by hours per week, against weeks until the deadline. A ratio at or above one is red (behind pace), 0.7 to 1 is yellow, below 0.7 is green. Grants use their phase: a developing grant is clocked on its submission deadline, an active one on its budget period, a submitted one has no clock at all.</p>
+  <p>Below the fields, the card has a few short sections: Objectives, Team, This Week, Upcoming Milestones, and <strong>Start Here Next Session</strong>, which is the note your next session opens with. A whole card looks like this:</p>
+  <pre><code>---
+card_schema: bob/2
+project: Shift Length and Officer Sleep: Pilot Study
+type: research
+status: active
+priority: high
+importance: high
+deadline: 2026-11-30
+target: Conference abstract submitted
+effort_remaining: 3w
+weekly_commitment: 6h
+last_updated: 2026-09-18
+blockers: null
+phase: execution
+blocking_others: "Co-I waiting on the cleaned actigraphy file"
+---
+
+## Objectives
+- Estimate the association between 12-hour shifts and total sleep time in a pilot sample
+- Produce a conference abstract and a pre-registration for the full study
+
+## This Week
+- Finish the actigraphy cleaning script and send the cleaned file to the Co-I
+- Draft the abstract's methods paragraph
+
+## Upcoming Milestones
+- 2026-09-25: Cleaned data to Co-I
+- 2026-11-30: Abstract submission deadline
+
+## Start Here Next Session
+- Open analysis/code/01_clean_actigraphy.R; the non-wear threshold is the open question
+- Then send the cleaned file and set blocking_others to null</code></pre>
+  <p>The card describes the present only and stays under 150 lines. History goes in the project's <code>docs/logs/</code>, and how-to-work conventions go in its <code>CLAUDE.md</code>. Bob prunes the card every time it updates one, moving anything dated or finished into a log.</p>
+
+  <h2 id="files">bob.md, CLAUDE.md, and the logs: three files, three jobs</h2>
+  <p>A project usually has two Markdown files at its root that look alike and must not overlap. <code>bob.md</code> says where the project stands; <code>CLAUDE.md</code> says how to work in it. The logs say what happened and why.</p>
+  <figure>
+    <img src="img/project-files.png" alt="The three project files and who writes each: CLAUDE.md read at startup, bob.md written by Bob, docs/logs written by the work session">
+    <figcaption>Each file answers one question, and each reaches the session differently.</figcaption>
+  </figure>
+  <div class="scroll"><table>
+    <tr><th></th><th><code>bob.md</code></th><th><code>docs/logs/</code></th><th><code>CLAUDE.md</code></th></tr>
+    <tr><td>Answers</td><td>Where does this stand right now?</td><td>What happened, and why?</td><td>How should anyone work here?</td></tr>
+    <tr><td>Tense</td><td>Present</td><td>Past</td><td>Instructions</td></tr>
+    <tr><td>Written by</td><td>Bob (<code>/bob add</code>, <code>/bob update</code>)</td><td>The session that did the work</td><td>You, when a convention changes</td></tr>
+    <tr><td>Changes</td><td>Every session; overwritten to current state</td><td>One new file per session; never edited</td><td>Rarely</td></tr>
+    <tr><td>Size</td><td>Under 150 lines</td><td>Unlimited</td><td>As short as you can make it</td></tr>
+  </table></div>
+  <p>Three rules keep them out of each other's way:</p>
+  <ol>
+    <li><strong>No status in CLAUDE.md.</strong> Deadlines, priorities and this week's tasks belong on the card. A copy in CLAUDE.md is a second source of truth that will go stale and contradict the first.</li>
+    <li><strong>No conventions or history in bob.md.</strong> "Always use the 2024 codebook" goes in CLAUDE.md. "On 10-22 the IRB returned 13 comments" goes in a log.</li>
+    <li><strong>If a fact matters to both, explain it once.</strong> The full explanation goes in CLAUDE.md, and the card carries a one-line pointer.</li>
+  </ol>
+  <div class="callout"><strong>A quick test for where a sentence goes.</strong> If it will be wrong next week, it belongs on the card. If it will still be true next year, it belongs in CLAUDE.md. If it is about something that already happened, it belongs in a log.</div>
+
+  <h2 id="day">A working day with Bob</h2>
+  <p>Four commands cover almost everything: plan in the morning, switch into a project, record what changed, plan the week on Friday.</p>
+  <div class="step"><div class="n">1</div><div><strong>Morning: <code>/bob</code>.</strong> Run it in a "hub" session started from <code>~/.claude</code>. Read the plan, pick the first project.</div></div>
+  <div class="step"><div class="n">2</div><div><strong>Switch: <code>/bob go &lt;project&gt;</code>.</strong> Bob copies a launch command. Press <code>Ctrl+Shift+`</code> in VS Code for a new terminal, paste, Enter. A fresh session starts inside the project as a new tab, loads that project's instructions and memory, and opens with a five-line pickup from its card. Close the tab when you're done.</div></div>
+  <div class="step"><div class="n">3</div><div><strong>Before you close a project tab: <code>/bob update &lt;project&gt;</code>.</strong> Bob records what changed on the card and moves the story into <code>docs/logs/</code>. Do this every session.</div></div>
+  <div class="step"><div class="n">4</div><div><strong>Friday: <code>/bob weekly</code>.</strong> A short planning conversation across everything: hours available next week, what's red, what's been quietly slipping, and two questions about meetings and deadlines Bob doesn't know about yet.</div></div>
+  <div class="callout"><strong>Why a fresh session for each project?</strong> A Claude session is tied to the folder it started in. Telling one session to "go work in" another folder doesn't load that project's CLAUDE.md, memory or history, and everything from the last project stays in the conversation. Only a session launched inside the project starts clean with the right instructions. That's what <code>/bob go</code> is for.</div>
+
+  <h2 id="daily">What a daily looks like</h2>
+  <p>Trimmed and anonymised, but the shape is real. Bob reads the cards with one script call, then writes this. Five minutes to read.</p>
+  <div class="sample"><b>Today, Wednesday</b>
+Available today: 7h (one meeting, 1h)
+
+<b>Urgent (RED):</b>
+- Grant application: full proposal to the research office Tue 11-10. About 11h left at 5h/wk is behind pace. Sub-deadline: partner's subaward packet by Fri.
+- Course module 5: live Monday, gate Sunday. Figures and the recording remain.
+
+<b>Focus today:</b>
+1. Grant: open the subaward packet, confirm the budget version, forward it; then outline the project description so tomorrow is drafting.
+2. Course: the four figures; record if the deck is clean.
+3. Shared study [BLOCKING]: one email sends the security pack that gates the IRB resubmit. It is your action, not theirs.
+
+<b>Important, not urgent (don't let this slide):</b>
+- Retirement-age paper: importance high, paused, untouched 34 days, 0h/wk. The December manuscript leans on a number from it. Needs a reset: new target, new hours.
+
+<b>Blocked:</b> Database mirror, waiting on a table list since 09-02. Nudge or admit it's parked.
+<b>Waiting on you:</b> a co-investigator needs your parser review for the 11-20 master dataset.
+<b>Mail:</b> 8 unread across shared projects. /bob mail
+<b>Stale (&gt;7 days):</b> 20 more cards, mostly the low-importance tail. /bob scan for the list.
+
+What looks wrong?</div>
+  <p>The last line is not decoration. Bob surfaces; you decide. Move things, defer them, kill them, and the next daily reflects it.</p>
+
+  <h2 id="shared">Shared projects</h2>
+  <p>A project several people work on keeps one card, not one per person. Everyone's Bob reads the same file.</p>
+  <figure>
+    <img src="img/shared-project.png" alt="A shared project: two people, each with their own agent, writing their own sections of one card and passing notes through the mailbox">
+    <figcaption>Ana runs Bob and Ben runs Knox, his renamed copy. Both work from one card, each writes only their own section, and they pass notes through the mailbox.</figcaption>
+  </figure>
+  <ul>
+    <li><strong>The steward</strong> (usually the project lead) owns the top of the card: phase, deadlines, blockers.</li>
+    <li><strong>Everyone else</strong> has a <code>## Person: &lt;name&gt;</code> section with their own This Week, waits and Start Here. Bob edits only your section and never rewrites the whole file.</li>
+    <li><strong>Your daily shows your part:</strong> your own tasks, the project-level state, and who is waiting on whom. A "changed since you last looked" line tells you when a teammate updated theirs.</li>
+    <li><strong>Sync conflicts:</strong> if your sync tool leaves a copy like <code>bob (Laptop).md</code>, Bob flags it and doesn't merge it. Sort it out by hand.</li>
+  </ul>
+  <h3>The mailbox</h3>
+  <p>Each shared project has a mailbox, <code>.bob/mail.md</code>, so the people and agents on it can pass notes without email: a handoff, "I moved the deadline", "your section is out of date". It syncs wherever the project syncs.</p>
+  <div class="cmd">
+    <code>/bob mail send &lt;project&gt; &lt;to&gt; &lt;subject&gt;</code><span>Bob asks for anything you left out, then adds exactly one line to the end of the file. <code>&lt;to&gt;</code> can be a person, an agent (<code>knox</code>), several names, or <code>all</code>.</span>
+    <code>/bob mail</code><span>Unread entries addressed to you across all your shared projects, newest first. Your daily also says when something is waiting.</span>
+  </div>
+  <pre><code>- 2026-10-16 | from: bob | to: all | Card format bob/2 | Shared cards now carry per-person sections.</code></pre>
+  <p>Append only; never edit or reorder someone's entry. Reading never touches the shared file: what you've read is tracked on your own machine, so opening mail can't create a sync conflict. Only the steward prunes, moving old entries into the project's logs word for word.</p>
+  <h3>Renaming your Bob</h3>
+  <p>You can give your scheduler its own name and personality, and shared projects keep working. Change <code>agent: bob</code> in <code>identity.md</code> to your agent's name; name new cards after it if you like, since cards are found by a tag in their header (<code>card_schema: bob/2</code>) rather than by filename; and rewrite or delete the marked personality block at the top of <code>agents/bob.md</code>. Mail addressed to your agent's name, your own name, or <code>all</code> reaches you.</p>
+  <div class="callout"><strong>One rule doesn't bend: one card per project.</strong> If two agents keep two cards in the same folder, they drift apart and nobody knows which is true. Agree on one card, whatever it's called. Before switching a solo project to shared, get everyone's agreement and merge any extra cards; the one not kept goes to <code>docs/archive/</code>, never the bin.</div>
+
+  <h2 id="commands">Command reference</h2>
+  <div class="scroll"><table>
+    <tr><th>Command</th><th>What it does</th></tr>
+    <tr><td><code>/bob</code></td><td>Today's plan (same as <code>/bob daily</code>)</td></tr>
+    <tr><td><code>/bob weekly</code></td><td>Friday planning across all projects</td></tr>
+    <tr><td><code>/bob monthly</code></td><td>Milestones and stale projects over the next few months</td></tr>
+    <tr><td><code>/bob add</code></td><td>Register the current project and write its card</td></tr>
+    <tr><td><code>/bob update &lt;project&gt;</code></td><td>Record a session's progress, prune the card</td></tr>
+    <tr><td><code>/bob go &lt;project&gt;</code></td><td>Copy the command that opens a fresh session inside the project</td></tr>
+    <tr><td><code>/bob &lt;project&gt;</code></td><td>Look up one project: status, path, next step</td></tr>
+    <tr><td><code>/bob grants</code></td><td>Grant portfolio by phase</td></tr>
+    <tr><td><code>/bob scan</code></td><td>Flag stale, oversized or incomplete cards</td></tr>
+    <tr><td><code>/bob remind &lt;note&gt; on &lt;date&gt;</code></td><td>A note delivered at session start on that date, plus a macOS Reminder</td></tr>
+    <tr><td><code>/bob event &lt;title&gt; on &lt;date&gt;</code></td><td>Block time on Bob's calendar, plus a macOS Calendar event</td></tr>
+    <tr><td><code>/bob mail</code>, <code>/bob mail send ...</code></td><td>Read or leave notes on shared projects</td></tr>
+    <tr><td><code>/bob ideas</code></td><td>Browse or add to the idea backlog</td></tr>
+  </table></div>
+  <p class="small">Under the hood, every view starts with one run of <code>skills/bob/collect.R</code>, which reads all the cards, the calendar and the mailboxes and prints a single facts sheet. Forty cards take under a second. The agent writes the view from that sheet.</p>
+
+  <h2 id="trouble">When something looks wrong</h2>
+  <div class="cmd">
+    <span><strong>It asks permission for every card</strong></span><span>The two settings lines are missing, or they are in a project settings file instead of your user <code>~/.claude/settings.json</code>. Add them there and restart the session.</span>
+    <span><strong>The daily is wrong</strong></span><span>The card is wrong. <code>/bob update &lt;project&gt;</code> and fix the fields; the next daily follows.</span>
+    <span><strong>A project is missing</strong></span><span>It isn't registered, or its folder moved. <code>/bob scan</code> lists untracked and missing projects; <code>/bob add</code> registers one.</span>
+    <span><strong>"Rscript not found"</strong></span><span>Install R, or make sure it's on the PATH Claude Code sees. Open a new session after installing.</span>
+    <span><strong>A card is red but paused</strong></span><span>Zero weekly hours against a real deadline is red by arithmetic. Bob flags it as paused; decide whether the pause still holds.</span>
+    <span><strong>Two cards in one folder</strong></span><span>Sync left a conflict copy, or two agents started separate cards. Bob flags both and merges nothing. Pick one, archive the other.</span>
+    <span><strong>Bob is too chatty, or not chatty enough</strong></span><span>The personality is one marked block at the top of <code>agents/bob.md</code>. Edit or delete it; nothing else depends on it.</span>
+  </div>
+  <p class="meta" style="margin-top:48px">Bob is a skill, an agent, a collector script and a few hooks, all plain text, all in <a href="https://github.com/petertanksley/bob-scheduler">the repository</a>. The <a href="https://github.com/petertanksley/bob-scheduler/blob/main/docs/quick-start.md">Quick Start</a> covers the same ground in Markdown; <a href="https://github.com/petertanksley/bob-scheduler/blob/main/skills/bob/card-spec.md">card-spec.md</a> is the exact contract a card follows.</p>
+</div>

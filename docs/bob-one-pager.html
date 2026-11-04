@@ -1,0 +1,176 @@
+<title>Bob at a Glance</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: one letter sheet, three bands; the loop diagram is the spine, text hangs off it. A printed handout, single look by design. */
+  :root {
+    --maroon: #501214;
+    --maroon-soft: #7a2a2d;
+    --ink: #221c19;
+    --ink-soft: #5a4f49;
+    --rule: #d9cfc6;
+    --paper: #ffffff;
+    --ground: #efe8df;
+    --tint: #f6efe8;
+    --font-display: "Bricolage Grotesque", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    --font-body: "Source Sans 3", "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+    --font-mono: "IBM Plex Mono", "SF Mono", Menlo, Consolas, monospace;
+  }
+  body { background: var(--ground); color: var(--ink); font-family: var(--font-body); font-size: 10.2pt; line-height: 1.32;
+         padding-block: 24px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .sheet { background: var(--paper); width: 8.5in; max-width: 100%; min-height: 11in; margin: 0 auto; padding: 0.45in 0.5in 0.4in;
+           box-shadow: 0 2px 18px rgba(34,28,25,.18); display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; }
+  @page { size: letter; margin: 0; }
+  @media print { body { background: var(--paper); padding: 0; } .sheet { box-shadow: none; margin: 0; width: 8.5in; min-height: 11in; }
+                 * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+  h1, h2, h3 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
+  h1 { font-size: 40pt; line-height: .95; font-weight: 700; color: var(--maroon); letter-spacing: -.01em; }
+  h2 { font-size: 10pt; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--maroon); border-bottom: 1.5px solid var(--maroon); padding-bottom: 3px; margin-bottom: 6px; }
+  p { margin: 0; }
+  code, .cmd { font-family: var(--font-mono); font-size: 9pt; }
+  code { background: var(--tint); padding: 0 3px; border-radius: 2px; }
+  .masthead { display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: end; border-bottom: 2px solid var(--maroon); padding-bottom: 10px; }
+  .tagline { font-family: var(--font-display); font-size: 14pt; font-weight: 500; line-height: 1.2; margin-top: 4px; max-width: 34ch; }
+  .needs { text-align: right; color: var(--ink-soft); font-size: 9.2pt; line-height: 1.35; }
+  .needs strong { color: var(--ink); display: block; font-size: 9.2pt; text-transform: uppercase; letter-spacing: .08em; }
+  .band { display: grid; gap: 14px; }
+  .band-2 { grid-template-columns: 1fr 1fr; }
+  .band-3 { grid-template-columns: 1.05fr 1fr 1.15fr; }
+  ul { margin: 0; padding-left: 1.05em; }
+  li { margin: 0 0 3px; }
+  li::marker { color: var(--maroon); }
+  .loop { display: grid; grid-template-columns: 1.15fr 2fr; gap: 14px; align-items: start; }
+  svg { width: 100%; height: auto; display: block; }
+  .diagram-caption { color: var(--ink-soft); font-size: 9pt; margin-top: 4px; }
+  table { border-collapse: collapse; width: 100%; font-size: 9.4pt; }
+  th, td { text-align: left; vertical-align: top; padding: 3px 6px 3px 0; border-bottom: 1px solid var(--rule); }
+  th { font-weight: 600; color: var(--ink-soft); font-size: 8.6pt; text-transform: uppercase; letter-spacing: .06em; }
+  td code { white-space: nowrap; }
+  .day { display: grid; grid-template-columns: auto 1fr; column-gap: 10px; row-gap: 5px; align-items: baseline; }
+  .day .cmd { color: var(--maroon); font-weight: 500; white-space: nowrap; }
+  .get pre { margin: 4px 0 6px; font-family: var(--font-mono); font-size: 8.8pt; line-height: 1.35; background: var(--tint); padding: 6px 8px; border-left: 3px solid var(--maroon); white-space: pre-wrap; }
+  .rule { border: 0; border-top: 1px solid var(--rule); margin: 0; }
+  .never { background: var(--tint); padding: 7px 9px; border-left: 3px solid var(--maroon); font-size: 9.4pt; margin-top: 6px; }
+  .never strong { color: var(--maroon); }
+  .foot { margin-top: auto; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; color: var(--ink-soft); font-size: 8.8pt; border-top: 1px solid var(--rule); padding-top: 6px; }
+  .foot a { color: var(--maroon); text-decoration: none; }
+  .kicker { color: var(--ink-soft); font-size: 9pt; }
+  @media (max-width: 760px) { .band-2, .band-3, .loop, .masthead { grid-template-columns: 1fr; } .needs { text-align: left; } .sheet { min-height: 0; padding: 20px 16px; } h1 { font-size: 32pt; } }
+</style>
+
+<div class="sheet">
+  <header class="masthead">
+    <div>
+      <h1>Bob</h1>
+      <p class="tagline">One status card per project. One command that reads them all and tells you what to work on today.</p>
+    </div>
+    <div class="needs">
+      <strong>Needs</strong>
+      Claude Code on a Mac<br>R on your PATH (<code>Rscript</code>)<br>Five minutes to install
+    </div>
+  </header>
+
+  <section class="loop">
+    <div>
+      <h2>What it is</h2>
+      <p>A scheduler that lives inside Claude Code. Every project you register carries a short Markdown card, <code>bob.md</code>. Bob reads all of them in one pass, weighs each deadline against the hours you actually have and how much the project matters, and gives you a plan: this morning, this week, this quarter.</p>
+      <div class="never"><strong>What it never does.</strong> Research, code, drafting. Bob plans; you work; the card gets updated so tomorrow's plan is right. If it isn't on the card, Bob doesn't know it happened.</div>
+    </div>
+    <div>
+      <h2>The loop</h2>
+      <svg viewBox="0 0 640 215" role="img" aria-label="Registry to status cards to Bob to your plan to a work session, with the update written back to the card and the calendar feeding Bob">
+        <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#5a4f49"/></marker></defs>
+        <g font-family="Source Sans 3, Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#221c19">
+          <rect x="4" y="30" width="140" height="58" rx="6" fill="#ffffff" stroke="#d9cfc6" stroke-width="1.5"/>
+          <text x="74" y="52" text-anchor="middle" font-weight="600">Registry</text>
+          <text x="74" y="70" text-anchor="middle" fill="#5a4f49" font-size="11">where each project lives</text>
+          <rect x="172" y="30" width="140" height="58" rx="6" fill="#ffffff" stroke="#d9cfc6" stroke-width="1.5"/>
+          <text x="242" y="52" text-anchor="middle" font-weight="600">Status cards</text>
+          <text x="242" y="70" text-anchor="middle" fill="#5a4f49" font-size="11">one bob.md per project</text>
+          <rect x="340" y="30" width="140" height="58" rx="6" fill="#ffffff" stroke="#d9cfc6" stroke-width="1.5"/>
+          <text x="410" y="52" text-anchor="middle" font-weight="600">Bob</text>
+          <text x="410" y="70" text-anchor="middle" fill="#5a4f49" font-size="11">deadline, effort, importance</text>
+          <rect x="500" y="30" width="136" height="58" rx="6" fill="#501214" stroke="#501214" stroke-width="1.5"/>
+          <text x="568" y="52" text-anchor="middle" font-weight="600" fill="#ffffff">Your plan</text>
+          <text x="568" y="70" text-anchor="middle" fill="#f6efe8" font-size="11">/bob daily, /bob weekly</text>
+          <rect x="340" y="140" width="140" height="58" rx="6" fill="#ffffff" stroke="#d9cfc6" stroke-width="1.5"/>
+          <text x="410" y="162" text-anchor="middle" font-weight="600">Calendar</text>
+          <text x="410" y="180" text-anchor="middle" fill="#5a4f49" font-size="11">hours, meetings, time away</text>
+          <rect x="500" y="140" width="136" height="58" rx="6" fill="#ffffff" stroke="#d9cfc6" stroke-width="1.5"/>
+          <text x="568" y="162" text-anchor="middle" font-weight="600">Work session</text>
+          <text x="568" y="180" text-anchor="middle" fill="#5a4f49" font-size="11">/bob go opens the project</text>
+          <g fill="none" stroke="#5a4f49" stroke-width="1.5" marker-end="url(#a)">
+            <path d="M144 59H170"/><path d="M312 59H338"/><path d="M480 59H498"/>
+            <path d="M410 140V90"/><path d="M568 88V138"/>
+            <path d="M500 169H330V205H242V90"/>
+          </g>
+          <text x="300" y="217" text-anchor="middle" fill="#5a4f49" font-size="11">/bob update writes what changed back to the card</text>
+          <text x="582" y="118" fill="#5a4f49" font-size="11">/bob go</text>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <section class="band band-2">
+    <div>
+      <h2>The card: six fields that place a project</h2>
+      <table>
+        <tr><th>Field</th><th>Means</th><th>Bob uses it to</th></tr>
+        <tr><td><code>deadline</code></td><td>the next date that bites</td><td>set the clock</td></tr>
+        <tr><td><code>effort_remaining</code></td><td>hours left, a rough guess</td><td>compute red, yellow, green</td></tr>
+        <tr><td><code>weekly_commitment</code></td><td>hours a week you can give</td><td>spot a pace that can't make it</td></tr>
+        <tr><td><code>priority</code></td><td>how much you want it worked now</td><td>order ties</td></tr>
+        <tr><td><code>importance</code></td><td>how much it matters, deadline or not</td><td>surface the quiet project losing to loud ones</td></tr>
+        <tr><td><code>blocking_others</code></td><td>someone is waiting on you</td><td>bump priority, add a BLOCKING badge</td></tr>
+      </table>
+      <p class="kicker" style="margin-top:5px">Below the fields: This Week, Upcoming Milestones, and <strong>Start Here Next Session</strong>, the note your next session opens with. Present tense only, under 150 lines. History goes in <code>docs/logs/</code>; how-to-work rules go in <code>CLAUDE.md</code>.</p>
+    </div>
+    <div>
+      <h2>A working day: four commands</h2>
+      <div class="day">
+        <span class="cmd">/bob</span><span>Morning, in a hub session started from <code>~/.claude</code>. Available hours, what's red, three or four focus tasks, the important thing nobody is chasing.</span>
+        <span class="cmd">/bob go &lt;project&gt;</span><span>Copies a launch line. New terminal tab, paste, Enter: a fresh session opens inside the project with its own instructions and memory, and a five-line pickup from the card.</span>
+        <span class="cmd">/bob update &lt;project&gt;</span><span>Before closing the tab. Records what changed on the card and moves the story into a dated log.</span>
+        <span class="cmd">/bob weekly</span><span>Friday. Hours next week, what's red, what has been quietly slipping, questions about the next three months.</span>
+      </div>
+      <p class="kicker" style="margin-top:7px">Also: <code>/bob add</code> registers a project after a short interview. <code>/bob grants</code>, <code>/bob scan</code>, <code>/bob remind</code>, <code>/bob event</code>, <code>/bob ideas</code>, <code>/bob &lt;project&gt;</code>.</p>
+    </div>
+  </section>
+
+  <section class="band band-3">
+    <div>
+      <h2>Why bother</h2>
+      <ul>
+        <li><strong>One view across everything.</strong> Grants with phases, papers, courses, admin, the exploratory thing: one table, sorted by what will hurt first.</li>
+        <li><strong>Urgency does not get to win by default.</strong> Importance is its own field. The high-importance project with no deadline is surfaced on purpose, with a warning when it goes stale.</li>
+        <li><strong>Clean project switching.</strong> Each project's session starts with the right instructions and nothing carried over.</li>
+        <li><strong>A handoff that survives you.</strong> The card tells any collaborator, or their agent, where things stand without a meeting.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Shared projects</h2>
+      <ul>
+        <li><strong>One card per project</strong>, never one per person. A steward owns the top (phase, deadlines, blockers); everyone else has a <code>## Person:</code> section and edits only that.</li>
+        <li><strong>Your daily shows your part</strong>: your tasks, the project state, who is waiting on whom, and a line when a teammate changed theirs.</li>
+        <li><strong>A mailbox</strong>, <code>.bob/mail.md</code>, for notes between people and agents. Append only; what you've read is tracked on your own machine.</li>
+        <li><strong>Rename your Bob</strong> if you like. Cards are found by a tag in their header, not by filename.</li>
+      </ul>
+    </div>
+    <div class="get">
+      <h2>Get it</h2>
+      <pre>git clone https://github.com/petertanksley/bob-scheduler.git
+cd bob-scheduler
+./install.sh</pre>
+      <p>Then two lines in <code>~/.claude/settings.json</code> under <code>permissions</code>, copied from <code>settings.permissions.example.json</code>:</p>
+      <ul style="margin-top:3px">
+        <li><code>additionalDirectories</code>: the folders your projects live in. Without it every card read asks permission.</li>
+        <li>the allow rule for Bob's collector script, so a daily runs in one call, no prompts.</li>
+      </ul>
+      <p style="margin-top:5px">Start a new session, type <code>/bob add</code> in a project folder, answer roughly. "About 10 hours, 2 a week" is plenty. Three cards in, run <code>/bob</code>.</p>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span><a href="https://github.com/petertanksley/bob-scheduler">github.com/petertanksley/bob-scheduler</a> · v2026.11.04 · Quick Start and full walkthrough in <code>docs/</code></span>
+    <span>If the daily looks wrong, the card is wrong. Fix the card, not the briefing.</span>
+  </footer>
+</div>
