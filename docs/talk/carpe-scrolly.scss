@@ -1,0 +1,136 @@
+/*-- scss:defaults --*/
+
+// Carpe Audience scrolly theme for closeread-html (Keyes 2011, chs. 9-10, 14; closeread 1.0.x).
+//   A sticky IS a slide: a 16:9 black frame (.carpe-slide) that keeps the deck's rules, so
+//   carpe.scss's layouts carry over one for one. Sizes are container-query units, so the frame
+//   scales to any viewport and type registers frame to frame exactly as it does slide to slide.
+//   The narrative column is the story: the speaker's notes, now read instead of heard.
+// Use as:  format: closeread-html: theme: [default, carpe-scrolly.scss]  css: carpe-fonts.css
+//          (fonts/ next to the page). Converter: carpe_scrolly.R. Author by hand: template_scrolly.qmd.
+
+$font-family-sans-serif: "Barlow Condensed", "Avenir Next Condensed", "Helvetica Neue", Arial, sans-serif;
+$body-bg: #000000;
+$body-color: #ffffff;
+$link-color: #ffffff;
+$link-hover-color: #ffffff;
+$grey: #8c8c8c;
+
+// Deck root is 40px on a 1280-wide slide = 3.125cqw. big 6em, medium 1.9em, small 0.55em.
+$size-big: 18.75cqw;
+$size-medium: 5.9375cqw;
+$size-small: 1.71875cqw;
+$pad-y: 3.75cqw;   // 48px of 1280
+$pad-x: 5cqw;      // 64px of 1280
+
+/*-- scss:rules --*/
+
+// closeread.css loads after the theme and sets these on :root, so set them on body (inherits, wins).
+body {
+  --cr-section-background-color: #000000;
+  --cr-narrative-background-color-overlay: rgba(0, 0, 0, 0.78);
+  --cr-narrative-text-color-overlay: #e2e2e2;
+  --cr-narrative-background-color-sidebar: #000000;
+  --cr-narrative-text-color-sidebar: #e2e2e2;
+  --cr-narrative-font-family: #{$font-family-sans-serif};
+  --cr-narrative-font-size: 1.3rem;
+  --cr-narrative-overlay-max-width: 36rem;
+  --cr-narrative-border-radius: 0.4em;
+  --cr-narrative-outer-margin: 4%;
+}
+
+body { background: #000000; color: #ffffff; font-family: $font-family-sans-serif; font-weight: 500; }
+// Carpe type registers top-left, so the lower part of a frame is usually empty: the narrative card
+// sits there (closeread centres it by default: padding-block 45svh).
+body .cr-section .narrative-col .trigger { padding-block: 64svh 26svh; }   // body: outrank closeread.css, which loads later
+.cr-section .narrative-col .narrative { font-weight: 500; line-height: 1.3; letter-spacing: 0; }
+.cr-section .narrative-col .narrative p { margin: 0 0 0.6em 0; }
+.cr-section .narrative-col .narrative p:last-child { margin-bottom: 0; }
+.cr-section .narrative-col .narrative a { color: #ffffff; text-decoration: underline; }
+
+// Chapter headings between sections (one section per Story) and any content outside a section.
+main#quarto-document-content > h2, main#quarto-document-content > section > h2 {
+  font-weight: 800; letter-spacing: -0.015em; color: #ffffff; margin: 2.5rem 0 1rem 0; border: 0;
+}
+
+// ---- the sticky as a slide --------------------------------------------------------
+.cr-section .sticky-col .sticky-col-stack .sticky.carpe-slide,
+.carpe-slide {
+  box-sizing: border-box;
+  width: min(100vw, calc(100dvh * 16 / 9));
+  aspect-ratio: 16 / 9;
+  container-type: inline-size;
+  position: relative; overflow: hidden;
+  padding: $pad-y $pad-x;
+  background-color: #000000; background-size: cover; background-position: center; background-repeat: no-repeat;
+  color: #ffffff; text-align: left; font-weight: 700; font-kerning: normal;
+}
+.carpe-slide :is(h1, h2, h3) { font-size: $size-medium; font-weight: 800; line-height: 0.95; letter-spacing: -0.015em; margin: 0 0 0.3em 0; color: #ffffff; text-shadow: none; }
+.carpe-slide p { font-size: $size-medium; font-weight: 800; line-height: 0.95; letter-spacing: -0.015em; margin: 0 0 0.3em 0; }
+.carpe-slide a { text-decoration: none; color: #ffffff; }
+.carpe-slide :is(h1, h2, h3) { border: 0; padding: 0; }   // Quarto's section-heading rule
+.carpe-slide :is(h1, h2):empty { display: none; }
+
+// big: one number or one word
+.carpe-slide.big p, .carpe-slide .stat {
+  font-size: $size-big; font-weight: 800; line-height: 0.9; letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+// small: labels, bylines, credits, captions
+.carpe-slide .small, .carpe-slide figcaption, .carpe-slide .credit, .carpe-slide .byline, .carpe-slide .label,
+.carpe-slide p.label, .carpe-slide.big p.label { font-size: $size-small; font-weight: 700; color: #cfcfcf; letter-spacing: 0; }
+.carpe-slide.big p .label, .carpe-slide .stat .label { font-size: 0.0917em; }
+.carpe-slide .byline { display: block; margin-top: 0.4em; }
+.carpe-slide .credit { position: absolute; bottom: 0.2em; right: 0.4em; }
+
+// quote
+.carpe-slide.quote blockquote { width: 100%; margin: 0; padding: 0; border: 0; box-shadow: none; background: none; font-style: normal; }
+.carpe-slide.quote blockquote p { font-size: $size-medium; }
+
+// power list: the lit item white, the rest grey
+.carpe-slide.power .items, .carpe-slide.power .items p { display: flex; flex-wrap: wrap; column-gap: 0.6em; row-gap: 0.1em; margin: 0; }
+.carpe-slide.power .items span { color: $grey; white-space: nowrap; }
+.carpe-slide.power .items span.on { color: #ffffff; }
+.carpe-slide .stat { display: block; color: #ffffff; margin-top: 0.1em; }
+
+// chart: the figure under at most a medium headline (600 of 720 px tall on the deck)
+.carpe-slide.chart img, .carpe-slide img.chart { display: block; margin: 0; max-height: 46.875cqw; max-width: 100%; height: auto; }
+.carpe-slide p:has(> img) { margin: 0; }
+
+// split: photo across two-thirds (background-size auto 100%, anchored left), type in the free third
+.carpe-slide.split { background-size: auto 100%; background-position: left center; }
+.carpe-slide.split > * { margin-left: 70%; max-width: 30%; display: block; }
+.carpe-slide.split.flip { background-position: right center; }
+.carpe-slide.split.flip > * { margin-left: 0; }
+
+// blank: nothing on screen
+.carpe-slide.blank > * { display: none; }
+
+// type over photographs: soft shadow, negative-space anchors
+.carpe-slide.has-bg :is(h1, h2, h3, p, span, blockquote) { text-shadow: 0 0 18px rgba(0, 0, 0, 0.9), 0 0 4px rgba(0, 0, 0, 0.8); }
+.carpe-slide.right > *       { margin-left: auto; text-align: right; display: block; max-width: 66%; }
+.carpe-slide.left-half > *   { max-width: 48%; display: block; }
+.carpe-slide.right-half > *  { max-width: 48%; display: block; margin-left: auto; }
+.carpe-slide.left-third > *  { max-width: 31%; display: block; }
+.carpe-slide.right-third > * { max-width: 31%; display: block; margin-left: auto; }
+
+// title block (the hook): one medium title, top-left; speaker and venue stay in the narrative
+.carpe-slide.quarto-title-block h1.title, .carpe-slide.title-slide h1 { font-size: $size-medium; margin: 0; }
+.carpe-slide.quarto-title-block :is(.subtitle, .quarto-title-authors, .quarto-title-meta, .date) { display: none; }
+
+// link to a backup and back: tiny, grey, lower right
+.carpe-slide a.carpe-link { position: absolute; bottom: 0.2em; right: 0.5em; font-size: $size-small; color: #555; font-weight: 700; }
+
+// ---- backups: ordinary page content after the last section, denser by design ---------------
+.carpe-backup { max-width: 60rem; margin: 2rem auto; padding: 0 1rem; }
+.carpe-backup h3 { font-weight: 800; letter-spacing: -0.015em; margin: 2rem 0 0.5rem 0; }
+.carpe-backup :is(p, li, td, th) { font-size: 1rem; font-weight: 600; line-height: 1.25; letter-spacing: 0; }
+.carpe-backup table { border-collapse: collapse; margin: 0.4em 0 0 0; }
+.carpe-backup :is(td, th) { border-bottom: 1px solid #333; padding: 0.25em 0.8em 0.25em 0; text-align: left; color: #e6e6e6; }
+.carpe-backup th { color: $grey; }
+.carpe-backup .small { color: #bdbdbd; }
+.carpe-backup a.carpe-link { color: #777; }
+
+// mobile: a 100vw frame is small; let big type breathe a little less and keep the narrative readable
+@media (max-width: 575.98px) {
+  :root { --cr-narrative-font-size: 1.05rem; --cr-narrative-overlay-max-width: 94vw; }
+}
