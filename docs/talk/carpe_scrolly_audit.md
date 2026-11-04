@@ -1,6 +1,6 @@
 # Carpe scrolly audit: bob_talk_scrolly.html
 
-6 sections · 34 stickies · 34 triggers · 1007 narrative words · 1 stubs
+6 sections · 34 stickies · 34 triggers · 1004 narrative words · 0 stubs
 
 | # | Sticky | Class | Words | Imgs | Triggers | Screen |
 |---|---|---|---|---|---|---|
@@ -40,7 +40,6 @@
 | 34 | cr-s34 | medium | 4 | 0 | 1 | Three cards by Friday |
 
 ## Findings
-- **major** 1 narrative blocks are still stubs: cr-s01
 - **advice** 4 narrative blocks under 8 words (cr-s06, cr-s07, cr-s09, cr-s16): a reader needs the sentence the slide belongs to
 - **advice** the YAML call-to-action does not appear on the page; the close should say it (p. 39)
 

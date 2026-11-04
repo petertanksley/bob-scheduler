@@ -33,6 +33,7 @@ format:
   block is that slide's notes, verbatim. Rewrite every block for a reader (see the _rewrite.md list),
   keep the stickies as they are, and press p in the browser for presentation mode.
   One section per Story. Re-running the converter overwrites this file.
+  Narrative rewritten for readers 2026-11-04 (rewrite pass done); re-converting would undo it.
 -->
 
 ## Hook
@@ -47,9 +48,8 @@ format:
 ```
 :::
 
-<!-- rewrite: s01 ·  · 0 words -->
 ::: {focus-on="cr-s01"}
-*[narrative to write]* <!-- TODO: this slide has no notes; write the sentence it belongs to, or merge it into the previous block -->
+Forty-one is the number of live projects on my registry, by actual count: grants in three different phases, two papers, a course, four datasets, the website, the admin folder. Most researchers carry a number like it, and nobody holds it in their head.
 :::
 
 ::: {#cr-s02 .carpe-slide .big}
@@ -58,9 +58,8 @@ format:
 ```
 :::
 
-<!-- rewrite: s02 · Hook · 45 words · spoken: this morning -->
 ::: {focus-on="cr-s02"}
-Forty-one. That is the number of live projects on my registry this morning, by actual count: grants in three different phases, two papers, a course, four datasets, the website, the admin folder. You are carrying some number like it. Nobody holds that in their head.
+Forty-one, then. Count yours the same way, folder by folder, and the figure is rarely smaller than you expect. The question this page answers is what happens to a number that size when nothing is keeping track of it.
 :::
 
 ::: {#cr-s03 .carpe-slide .medium}
@@ -69,9 +68,8 @@ Forty-one. That is the number of live projects on my registry this morning, by a
 ```
 :::
 
-<!-- rewrite: s03 · Hook · 70 words · spoken: I will -->
 ::: {focus-on="cr-s03"}
-What happens is that the loud ones, the ones with a date, eat the week, and the quiet ones, the ones that matter most and have no deadline precisely because nobody is forcing them, stop moving. This is ten minutes on one small habit that fixes that, and what it takes to set it up this week. I will not explain how Claude Code works inside; the walkthrough does that.
+The loud projects, the ones with a date, eat the week. The quiet ones, the ones that matter most and have no deadline precisely because nobody is forcing them, stop moving. This page is about one small habit that fixes that, and what it takes to set it up in a week. How Claude Code works inside is a separate subject; the walkthrough covers it.
 :::
 
 :::
@@ -86,7 +84,6 @@ What happens is that the loud ones, the ones with a date, eat the week, and the 
 ```
 :::
 
-<!-- rewrite: s04 · The card · 24 words -->
 ::: {focus-on="cr-s04"}
 Every project gets one short Markdown file at its root, called bob.md. Six fields on it decide where the project lands in your day.
 :::
@@ -99,9 +96,8 @@ Every project gets one short Markdown file at its root, called bob.md. Six field
 ```
 :::
 
-<!-- rewrite: s05 · The card · 11 words -->
 ::: {focus-on="cr-s05"}
-Six fields. Here they are together; then one at a time.
+The six fields, together first, then one at a time.
 :::
 
 ::: {#cr-s06 .carpe-slide .power}
@@ -112,7 +108,6 @@ Six fields. Here they are together; then one at a time.
 ```
 :::
 
-<!-- rewrite: s06 · The card · 2 words -->
 ::: {focus-on="cr-s06"}
 The deadline.
 :::
@@ -125,7 +120,6 @@ The deadline.
 ```
 :::
 
-<!-- rewrite: s07 · The card · 4 words -->
 ::: {focus-on="cr-s07"}
 The hours left, roughly.
 :::
@@ -138,7 +132,6 @@ The hours left, roughly.
 ```
 :::
 
-<!-- rewrite: s08 · The card · 8 words -->
 ::: {focus-on="cr-s08"}
 The hours a week you can give it.
 :::
@@ -151,7 +144,6 @@ The hours a week you can give it.
 ```
 :::
 
-<!-- rewrite: s09 · The card · 7 words -->
 ::: {focus-on="cr-s09"}
 Priority: what you want worked on now.
 :::
@@ -164,9 +156,8 @@ Priority: what you want worked on now.
 ```
 :::
 
-<!-- rewrite: s10 · The card · 29 words -->
 ::: {focus-on="cr-s10"}
-Slow down here. Importance: how much it matters, whether or not anything is due. Set by you, not by any date. Keep this one in mind; it comes back.
+Importance deserves a pause. It is how much the project matters, whether or not anything is due, and it is set by you, never by a date. It comes back later, because it is the field that saves the quiet projects.
 :::
 
 ::: {#cr-s11 .carpe-slide .power}
@@ -177,9 +168,8 @@ Slow down here. Importance: how much it matters, whether or not anything is due.
 ```
 :::
 
-<!-- rewrite: s11 · The card · 17 words -->
 ::: {focus-on="cr-s11"}
-And whether someone is waiting on you. That bumps the project up a level and badges it.
+Blocking: whether someone is waiting on you. That bumps the project up a level and badges it.
 :::
 
 ::: {#cr-s12 .carpe-slide .power}
@@ -190,9 +180,8 @@ And whether someone is waiting on you. That bumps the project up a level and bad
 ```
 :::
 
-<!-- rewrite: s12 · The card · 27 words -->
 ::: {focus-on="cr-s12"}
-That is it. Six fields. Under them, three short sections: what you are doing this week, the next milestones, and a note called Start Here Next Session.
+That is all six. Under them sit three short sections: what you are doing this week, the next milestones, and a note called Start Here Next Session.
 :::
 
 ::: {#cr-s13 .carpe-slide .medium}
@@ -201,7 +190,6 @@ That is it. Six fields. Under them, three short sections: what you are doing thi
 ```
 :::
 
-<!-- rewrite: s13 · The card · 34 words -->
 ::: {focus-on="cr-s13"}
 Start Here Next Session is the first thing your next session reads. Ten lines at most, rewritten every time. It is the handoff from you to the you of tomorrow, or to a teammate.
 :::
@@ -212,9 +200,8 @@ Start Here Next Session is the first thing your next session reads. Ten lines at
 ```
 :::
 
-<!-- rewrite: s14 · The card · 47 words -->
 ::: {focus-on="cr-s14"}
-The card stays under a hundred and fifty lines. It describes the present only. What happened goes into a dated log; how to work in the project goes into the instructions file. Bob prunes it every time it updates one, so it cannot grow into a diary.
+The card stays under a hundred and fifty lines. It describes the present only. What happened goes into a dated log; how to work in the project goes into the instructions file. Bob prunes the card every time it updates one, so it cannot grow into a diary.
 :::
 
 ::: {#cr-s15 .carpe-slide .medium}
@@ -223,9 +210,8 @@ The card stays under a hundred and fifty lines. It describes the present only. W
 ```
 :::
 
-<!-- rewrite: s15 · The card · 45 words -->
 ::: {focus-on="cr-s15"}
-One rule holds everything up: if it is not on the card, it did not happen. A card that is not updated looks exactly like a project that did not move. Everything else in this talk is in service of keeping that one file honest.
+One rule holds everything up: if it is not on the card, it did not happen. A card that is not updated looks exactly like a project that did not move. Everything that follows is in service of keeping that one file honest.
 :::
 
 :::
@@ -242,7 +228,6 @@ One rule holds everything up: if it is not on the card, it did not happen. A car
 ```
 :::
 
-<!-- rewrite: s16 · The day · 5 words -->
 ::: {focus-on="cr-s16"}
 Four commands cover almost everything.
 :::
@@ -255,9 +240,8 @@ Four commands cover almost everything.
 ```
 :::
 
-<!-- rewrite: s17 · The day · 42 words · spoken: today -->
 ::: {focus-on="cr-s17"}
-In the morning, in a hub session, you type slash bob. It reads every card in under a second and gives you today’s hours, what is red, three or four focus tasks, and a line for the important thing nobody is chasing.
+In the morning, in a hub session, type /bob. It reads every card in under a second and returns the day's hours, what is red, three or four focus tasks, and a line for the important thing nobody is chasing.
 :::
 
 ::: {#cr-s18 .carpe-slide .power}
@@ -268,9 +252,8 @@ In the morning, in a hub session, you type slash bob. It reads every card in und
 ```
 :::
 
-<!-- rewrite: s18 · The day · 42 words -->
 ::: {focus-on="cr-s18"}
-You pick the first project and type slash bob go and its name. That copies a launch line; new terminal tab, paste, enter, and a fresh session opens inside that project with its own instructions and a five-line pickup from its card.
+Pick the first project and type /bob go with its name. That copies a launch line. A new terminal tab, paste, enter, and a fresh session opens inside that project with its own instructions and a five-line pickup from its card.
 :::
 
 ::: {#cr-s19 .carpe-slide .medium}
@@ -279,9 +262,8 @@ You pick the first project and type slash bob go and its name. That copies a lau
 ```
 :::
 
-<!-- rewrite: s19 · The day · 44 words · spoken: in the room -->
 ::: {focus-on="cr-s19"}
-Nothing from the last project comes along, which is the point. A session belongs to the folder it started in. Telling one session to go work somewhere else does not load that project’s instructions or memory, and the old conversation stays in the room.
+Nothing from the last project comes along, which is the point. A session belongs to the folder it started in. Telling one session to go work somewhere else does not load that project's instructions or memory, and the old conversation stays behind.
 :::
 
 ::: {#cr-s20 .carpe-slide .power}
@@ -292,9 +274,8 @@ Nothing from the last project comes along, which is the point. A session belongs
 ```
 :::
 
-<!-- rewrite: s20 · The day · 30 words -->
 ::: {focus-on="cr-s20"}
-Before you close that tab, slash bob update. Bob writes what changed onto the card and moves the story into a log. Every session, no exceptions; this is the habit.
+Before closing that tab, /bob update. Bob writes what changed onto the card and moves the story into a log. Every session, no exceptions; this is the habit.
 :::
 
 ::: {#cr-s21 .carpe-slide .power}
@@ -305,9 +286,8 @@ Before you close that tab, slash bob update. Bob writes what changed onto the ca
 ```
 :::
 
-<!-- rewrite: s21 · The day · 29 words -->
 ::: {focus-on="cr-s21"}
-And on Friday, slash bob weekly: hours next week, what is red, what has quietly slipped, and two questions about meetings and deadlines it does not know about yet.
+On Friday, /bob weekly: hours next week, what is red, what has quietly slipped, and two questions about meetings and deadlines it does not know about yet.
 :::
 
 :::
@@ -322,9 +302,8 @@ And on Friday, slash bob weekly: hours next week, what is red, what has quietly 
 ```
 :::
 
-<!-- rewrite: s22 · Quiet projects · 33 words · spoken: here is -->
 ::: {focus-on="cr-s22"}
-Here is the part I actually care about. Deadline pressure is arithmetic: hours left over hours a week, against weeks to the date. Red, yellow, green. That measures urgency, and urgency is loud.
+This is the part that matters most. Deadline pressure is arithmetic: hours left over hours a week, against weeks to the date. Red, yellow, green. That measures urgency, and urgency is loud.
 :::
 
 ::: {#cr-s23 .carpe-slide .medium}
@@ -333,7 +312,6 @@ Here is the part I actually care about. Deadline pressure is arithmetic: hours l
 ```
 :::
 
-<!-- rewrite: s23 · Quiet projects · 36 words -->
 ::: {focus-on="cr-s23"}
 Importance is a separate field, set by you, and Bob crosses the two. The project with high importance and no deadline gets surfaced in every briefing, on purpose, and the warning sharpens when it goes stale.
 :::
@@ -346,9 +324,8 @@ Importance is a separate field, set by you, and Bob crosses the two. The project
 ```
 :::
 
-<!-- rewrite: s24 · Quiet projects · 38 words -->
 ::: {focus-on="cr-s24"}
-: turn to the screen, read it silently, turn back. This is a line from my own briefing this week, trimmed. That paper feeds a manuscript due in December. Without the line it would have slid to January.
+That line is from my own briefing this week, trimmed. The paper behind it feeds a manuscript due in December. Without the line it would have slid to January.
 :::
 
 ::: {#cr-s25 .carpe-slide .medium}
@@ -357,7 +334,6 @@ Importance is a separate field, set by you, and Bob crosses the two. The project
 ```
 :::
 
-<!-- rewrite: s25 · Quiet projects · 34 words -->
 ::: {focus-on="cr-s25"}
 Every briefing ends with the same three words: what looks wrong. Bob surfaces; you decide. Move things, defer them, kill them, and the next daily reflects it. It never makes the call for you.
 :::
@@ -374,9 +350,8 @@ Every briefing ends with the same three words: what looks wrong. Bob surfaces; y
 ```
 :::
 
-<!-- rewrite: s26 · Together · 47 words -->
 ::: {focus-on="cr-s26"}
-Shared projects keep one card, never one per person. The lead is the steward and owns the top of it: phase, deadlines, blockers. Everyone else has their own section and edits only that. Your daily shows your tasks, the project’s state, and who is waiting on whom.
+Shared projects keep one card, never one per person. The lead is the steward and owns the top of it: phase, deadlines, blockers. Everyone else has their own section and edits only that. Your daily shows your tasks, the project's state, and who is waiting on whom.
 :::
 
 ::: {#cr-s27 .carpe-slide .medium}
@@ -385,7 +360,6 @@ Shared projects keep one card, never one per person. The lead is the steward and
 ```
 :::
 
-<!-- rewrite: s27 · Together · 38 words -->
 ::: {focus-on="cr-s27"}
 Notes between people and their assistants go in a mailbox file in the project folder. One line each, append only, and what you have read is tracked on your own machine, so reading never causes a sync conflict.
 :::
@@ -396,7 +370,6 @@ Notes between people and their assistants go in a mailbox file in the project fo
 ```
 :::
 
-<!-- rewrite: s28 · Together · 46 words -->
 ::: {focus-on="cr-s28"}
 One rule about where projects live, because it bites on day two. A project is on the synced drive or in a git checkout, never both. A git repository inside a syncing folder gets corrupted, because the sync client writes into it while git is working.
 :::
@@ -407,9 +380,8 @@ One rule about where projects live, because it bites on day two. A project is on
 ```
 :::
 
-<!-- rewrite: s29 · Together · 43 words -->
 ::: {focus-on="cr-s29"}
-The synced registry follows you between machines; a local one lists each machine’s clones. Pull your clones before you run the daily, because a stale clone shows a stale card. On the second machine, slash bob scan tells you what is missing here.
+The synced registry follows you between machines; a local one lists each machine's clones. Pull your clones before running the daily, because a stale clone shows a stale card. On the second machine, /bob scan says what is missing there.
 :::
 
 :::
@@ -424,9 +396,8 @@ The synced registry follows you between machines; a local one lists each machine
 ```
 :::
 
-<!-- rewrite: s30 · Close · 23 words -->
 ::: {focus-on="cr-s30"}
-Five minutes to install: clone the repository, run the installer, two lines in your settings file. The one-pager you are getting has them.
+Five minutes to install: clone the repository, run the installer, add two lines to your settings file. The one-pager lists them.
 :::
 
 ::: {#cr-s31 .carpe-slide .big}
@@ -435,9 +406,8 @@ Five minutes to install: clone the repository, run the installer, two lines in y
 ```
 :::
 
-<!-- rewrite: s31 · Close · 35 words -->
 ::: {focus-on="cr-s31"}
-Three cards by Friday: open a project, type slash bob add, answer roughly. About ten hours, two a week is plenty. Then the next project. Three is enough for the first daily to mean something.
+Three cards by Friday: open a project, type /bob add, answer roughly. About ten hours, two a week is plenty. Then the next project. Three is enough for the first daily to mean something.
 :::
 
 ::: {#cr-s32 .carpe-slide .medium}
@@ -446,9 +416,8 @@ Three cards by Friday: open a project, type slash bob add, answer roughly. About
 ```
 :::
 
-<!-- rewrite: s32 · Close · 28 words · spoken: I will -->
 ::: {focus-on="cr-s32"}
-Then type slash bob. If the daily looks wrong, the card is wrong; fix the card. I will sit with anyone for fifteen minutes to get set up.
+Then type /bob. If the daily looks wrong, the card is wrong; fix the card. Fifteen minutes with the presenter is enough to get set up.
 :::
 
 ::: {#cr-s33 .carpe-slide .medium}
@@ -457,9 +426,8 @@ Then type slash bob. If the daily looks wrong, the card is wrong; fix the card. 
 ```
 :::
 
-<!-- rewrite: s33 · Close · 32 words -->
 ::: {focus-on="cr-s33"}
-Callback to the opening. So, back to the number I started with. Each of you has one. Say it to yourself now, and then count how many of those have a card.
+Back to the opening number. Everyone has one. Count how many of those projects have a card.
 :::
 
 ::: {#cr-s34 .carpe-slide .medium}
@@ -468,7 +436,6 @@ Callback to the opening. So, back to the number I started with. Each of you has 
 ```
 :::
 
-<!-- rewrite: s34 · Close · 9 words -->
 ::: {focus-on="cr-s34"}
 Three cards by Friday. That is the whole ask.
 :::
