@@ -85,6 +85,7 @@ main#quarto-document-content > h2, main#quarto-document-content > section > h2 {
 // quote
 .carpe-slide.quote blockquote { width: 100%; margin: 0; padding: 0; border: 0; box-shadow: none; background: none; font-style: normal; }
 .carpe-slide.quote blockquote p { font-size: $size-medium; }
+.carpe-slide blockquote, .carpe-slide blockquote p { color: #ffffff; border: 0; }   // Bootstrap greys blockquotes
 
 // power list: the lit item white, the rest grey
 .carpe-slide.power .items, .carpe-slide.power .items p { display: flex; flex-wrap: wrap; column-gap: 0.6em; row-gap: 0.1em; margin: 0; }
@@ -114,8 +115,8 @@ main#quarto-document-content > h2, main#quarto-document-content > section > h2 {
 .carpe-slide.right-third > * { max-width: 31%; display: block; margin-left: auto; }
 
 // title block (the hook): one medium title, top-left; speaker and venue stay in the narrative
-.carpe-slide.quarto-title-block h1.title, .carpe-slide.title-slide h1 { font-size: $size-medium; margin: 0; }
-.carpe-slide.quarto-title-block :is(.subtitle, .quarto-title-authors, .quarto-title-meta, .date) { display: none; }
+.carpe-slide.carpe-title h1.title, .carpe-slide.title-slide h1 { font-size: $size-medium; margin: 0; }
+.carpe-slide.carpe-title :is(.subtitle, .quarto-title-authors, .quarto-title-meta, .date) { display: none; }
 
 // link to a backup and back: tiny, grey, lower right
 .carpe-slide a.carpe-link { position: absolute; bottom: 0.2em; right: 0.5em; font-size: $size-small; color: #555; font-weight: 700; }

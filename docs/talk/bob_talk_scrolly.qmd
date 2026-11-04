@@ -40,7 +40,7 @@ format:
 
 ::: {.cr-section}
 
-::: {#cr-s01 .carpe-slide .quarto-title-block}
+::: {#cr-s01 .carpe-slide .carpe-title}
 ```{=html}
 <h1 class="title">How many are you carrying?</h1>
 <div class="quarto-title-authors">
