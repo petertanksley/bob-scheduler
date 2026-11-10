@@ -89,6 +89,8 @@ A Claude Code session is tied to the folder it was launched from: that folder de
 
 By default it copies `cd "<project>" && claude "<orient prompt>"` to the clipboard. In VS Code, press `` Ctrl+Shift+` `` for a new terminal, paste, and press Enter: the project session joins the terminal panel's tab list in the same window and opens with a five-line pickup from the card. `--window` opens the project in its own VS Code window with a Claude panel instead; `--terminal` opens a Terminal.app window. `--bare` skips the pickup prompt.
 
+**Choosing the model up front.** Switching models partway through a session is awkward, so `/bob go` settles it at launch. `/bob go <project> --sonnet` (or `--opus`, `--haiku`, `--fable`, `--model <name>`) puts `--model` into the copied command. With no model given, Bob asks once, with a recommendation based on the project's next tasks and on which models its past sessions used. A `model:` line in the card's frontmatter makes that the project's standing choice and skips the question. `--window` cannot carry a model.
+
 The matcher is `skills/bob/go.R` (base R, so it needs `Rscript` on your PATH). It checks folder names first, then display names, and lists the candidates when a name is ambiguous.
 
 ## Data files

@@ -13,12 +13,42 @@
 #   --terminal open a new Terminal.app window running the command instead
 #   --bare     start claude with no orientation prompt
 #   --dry-run  print the match and the command, launch nothing
+#   --suggest  print the card's next tasks and the models past sessions used, launch nothing
+#   --model <alias> (or --model=<alias>, --fable, --opus, --sonnet, --haiku)
+#              start the session on that model. With no flag, a `model:` line in
+#              the project card's frontmatter is used; with neither, the default.
+#              Not available with --window (the VS Code URI cannot carry a model).
 #
 # Exit codes: 0 launched (or dry run), 1 no match / bad path, 2 ambiguous
 # (candidates printed one per line as "name<TAB>path").
 # macOS only: uses osascript and open.
 
 args  <- commandArgs(trailingOnly = TRUE)
+
+# ---- Model --------------------------------------------------------------------
+# --model <alias>, --model=<alias>, or the shorthands --fable / --opus / --sonnet / --haiku.
+# Pulled out of args first so the alias is not mistaken for a query word.
+model <- ""
+i <- which(args == "--model")
+if (length(i) > 0 && i[1] < length(args)) {
+  model <- args[i[1] + 1]
+  args  <- args[-c(i[1], i[1] + 1)]
+}
+eq <- grep("^--model=", args)
+if (length(eq) > 0) {
+  model <- sub("^--model=", "", args[eq[1]])
+  args  <- args[-eq]
+}
+short <- intersect(args, c("--fable", "--opus", "--sonnet", "--haiku"))
+if (length(short) > 0) {
+  model <- sub("^--", "", short[1])
+  args  <- setdiff(args, short)
+}
+if (nzchar(model) && !grepl("^[][A-Za-z0-9._-]+$", model)) {
+  cat(sprintf("Not a usable model name: '%s'\n", model))
+  quit(status = 1)
+}
+
 flags <- args[startsWith(args, "--")]
 query <- trimws(paste(args[!startsWith(args, "--")], collapse = " "))
 if (!nzchar(query)) {
@@ -36,10 +66,12 @@ read_active <- function(file) {
   if (length(start) == 0) return(NULL)
   end   <- c(heads[heads > start[1]], length(lines) + 1)[1] - 1
   lines <- lines[start[1]:end]
+  # Two row formats: registry.md uses "- **Name** → `path`"; registry-local.md uses "- Name | path"
   rows  <- regmatches(lines, regexec("^- \\*\\*(.+?)\\*\\*.*?`([^`]+)`", lines))
-  rows  <- Filter(function(m) length(m) == 3, rows)
-  data.frame(name = vapply(rows, `[`, "", 2),
-             path = vapply(rows, `[`, "", 3))
+  rows2 <- regmatches(lines, regexec("^- ([^|`*]+?) \\| (/.+?)\\s*$", lines))
+  rows  <- Filter(function(m) length(m) == 3, c(rows, rows2))
+  data.frame(name = trimws(vapply(rows, `[`, "", 2)),
+             path = trimws(vapply(rows, `[`, "", 3)))
 }
 
 reg <- rbind(read_active(path.expand("~/.claude/bob/registry.md")),
@@ -79,6 +111,47 @@ if (!dir.exists(hit$path)) {
   quit(status = 1)
 }
 
+# ---- Suggest ------------------------------------------------------------------
+# --suggest: print what the caller needs to recommend a model, then exit without
+# launching: the card's type/status/deadline and next tasks, and which models the
+# project's recent sessions ran on (read from ~/.claude/projects/<slug>/*.jsonl).
+
+if ("--suggest" %in% flags) {
+  cat(sprintf("%s\n%s\n", hit$name, hit$path))
+  card <- file.path(hit$path, "bob.md")
+  if (file.exists(card)) {
+    cl <- readLines(card, warn = FALSE)
+    fm <- grep("^(type|status|priority|deadline|target|effort_remaining|model):", cl, value = TRUE)
+    cat("-- card\n"); cat(substr(fm, 1, 160), sep = "\n")
+    sect <- function(title, n) {
+      a <- grep(paste0("^## ", title), cl)
+      if (length(a) == 0) return(invisible())
+      rest <- cl[(a[1] + 1):length(cl)]
+      b <- grep("^## ", rest)
+      body <- rest[seq_len(if (length(b)) b[1] - 1 else length(rest))]
+      body <- body[nzchar(trimws(body))]
+      cat(sprintf("-- %s\n", title)); cat(substr(head(body, n), 1, 200), sep = "\n")
+    }
+    sect("Start Here Next Session", 6); sect("This Week", 8)
+  } else cat("-- card: none\n")
+  slug <- gsub("[^A-Za-z0-9]", "-", normalizePath(hit$path, mustWork = FALSE))
+  sdir <- file.path(path.expand("~/.claude/projects"), slug)
+  logs <- if (dir.exists(sdir)) list.files(sdir, pattern = "\\.jsonl$", full.names = TRUE) else character()
+  cat(sprintf("-- past sessions: %d\n", length(logs)))
+  if (length(logs) > 0) {
+    info <- file.info(logs); logs <- logs[order(info$mtime, decreasing = TRUE)]
+    for (f in head(logs, 8)) {
+      tx <- readLines(f, warn = FALSE)
+      mm <- unlist(regmatches(tx, gregexpr('"model":"[^"]+"', tx)))
+      mm <- sub('"model":"([^"]+)"', "\\1", mm); mm <- mm[mm != "<synthetic>"]
+      tab <- sort(table(mm), decreasing = TRUE)
+      cat(sprintf("%s  %s\n", format(file.info(f)$mtime, "%Y-%m-%d"),
+                  if (length(tab)) paste(sprintf("%s x%d", names(tab), as.integer(tab)), collapse = ", ") else "(no model recorded)"))
+    }
+  }
+  quit(status = 0)
+}
+
 # ---- Launch -------------------------------------------------------------------
 
 orient <- paste("Orient me: read this project's bob.md (Start Here Next Session,",
@@ -87,8 +160,21 @@ orient <- paste("Orient me: read this project's bob.md (Start Here Next Session,
 claude_bin <- Sys.which("claude")
 if (!nzchar(claude_bin)) claude_bin <- "claude"
 
-shell_cmd <- paste("cd", shQuote(hit$path), "&&", shQuote(claude_bin),
-                   if (!"--bare" %in% flags) shQuote(orient))
+# No model flag: fall back to a `model:` line in the project card's frontmatter, if it has one.
+model_src <- if (nzchar(model)) "flag" else ""
+if (!nzchar(model)) {
+  card <- file.path(hit$path, "bob.md")
+  if (file.exists(card)) {
+    top <- readLines(card, n = 40, warn = FALSE)
+    m   <- regmatches(top, regexec("^model:\\s*([][A-Za-z0-9._-]+)", top))
+    m   <- Filter(function(v) length(v) == 2, m)
+    if (length(m) > 0) { model <- m[[1]][2]; model_src <- "card" }
+  }
+}
+
+shell_cmd <- paste(c("cd", shQuote(hit$path), "&&", shQuote(claude_bin),
+                     if (nzchar(model)) c("--model", shQuote(model)),
+                     if (!"--bare" %in% flags) shQuote(orient)), collapse = " ")
 
 if (!any(c("--window", "--terminal") %in% flags)) {
   # Default: copy the launch command for a new VS Code terminal tab in the
@@ -111,6 +197,12 @@ if (!any(c("--window", "--terminal") %in% flags)) {
 }
 
 cat(sprintf("%s\n%s\n", hit$name, hit$path))
+if (nzchar(model)) {
+  cat(sprintf("model: %s (from %s)%s\n", model, model_src,
+              if ("--window" %in% flags) " -- ignored: --window cannot set a model" else ""))
+} else {
+  cat("model: session default\n")
+}
 if ("--dry-run" %in% flags) {
   cat(paste(cmd, collapse = " "), "\n")
   if (exists("cmd2")) cat(paste(cmd2, collapse = " "), "\n")

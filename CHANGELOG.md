@@ -1,5 +1,12 @@
 # Changelog
 
+## v2026.11.10: `/bob go` picks the model
+
+- **Model at launch.** `/bob go <project> --model <alias>` (or `--fable`, `--opus`, `--sonnet`, `--haiku`) adds `--model` to the copied launch command, so a session starts on the right model and never switches midstream. Not available with `--window`, whose VS Code link cannot carry a model.
+- **Bob asks when you don't say.** With no model given, Bob asks once and recommends one, going by the project's next tasks and the models its past sessions ran on. `go.R --suggest` prints those facts (card type, Start Here, This Week, per-session models read from `~/.claude/projects/`) and launches nothing.
+- **Per-project default.** An optional `model:` line in a card's frontmatter is used when no flag is given and skips the question. Documented in `card-spec.md`.
+- `go.R` also reads registry rows written as `- Name | /path`, alongside the bold-name and backtick-path form.
+
 ## v2026.11.04: collector, prompt-free reads
 
 - **`skills/bob/collect.R`.** One base-R script gathers the whole portfolio and prints a facts sheet: every card located and parsed (solo, shared, queue), deadline pressure, staleness, Eisenhower quadrant, line budgets, cross-person waits, "changed since you last looked", unread mail, calendar availability, pending notes and a data-problems list. The agent runs it once per view instead of opening cards one by one: a daily that took 14 shell calls and eight minutes now needs one call that returns in under a second, plus the write-up. `--store` saves the shared-card fingerprints and marks mail read. Modes: `daily`, `weekly`, `monthly`, `grants`, `scan`, `mail`, `lookup <words>`.
