@@ -94,7 +94,7 @@ Run the collector once, before anything else, and build the view from its output
 Rscript ~/.claude/skills/bob/collect.R <mode> [query words] [--store]
 ```
 
-Modes: `daily`, `weekly`, `monthly`, `grants`, `scan`, `mail`, `lookup <words>`. It reads both registries, finds every card by the rules below, parses the frontmatter (including `people:` on shared cards) and prints one Markdown facts sheet: availability for the window; a table of every project sorted by the Priority Logic below with pressure colour and ratio, days to deadline, parsed effort and weekly hours, staleness and badges (`BLOCKING`, `BLOCKED`, `PAUSED`, `RESUME-PASSED`, `AWARDED-needs-setup`, `REPORT-DUE`, `SHARED`, `QUEUE`, `CONFLICT-COPY`, `UNTRACKED`, `MISSING`, `NO-IMPORTANCE`, `SOFT-TARGET`); the Q2 and Q3 lists for the Eisenhower check; each card's This Week, Start Here and Upcoming Milestones verbatim (your own person section on shared cards); queue rows; cross-person waits; "changed since you last looked"; the unread mail count; calendar events, pending notes and the idea count; and a Data problems list (missing folders, untracked projects, over-budget cards, conflict copies, legacy cards). Under a second for forty cards.
+Modes: `daily`, `weekly`, `monthly`, `grants`, `scan`, `mail`, `lookup <words>`. It reads both registries, finds every card by the rules below, parses the frontmatter (including `people:` on shared cards) and prints one Markdown facts sheet: availability for the window; a table of every project sorted by the Priority Logic below with pressure colour and ratio, days to deadline, parsed effort and weekly hours, staleness and badges (`BLOCKING`, `BLOCKED`, `PAUSED`, `RESUME-PASSED`, `AWARDED-needs-setup`, `REPORT-DUE`, `SHARED`, `QUEUE`, `CONFLICT-COPY`, `UNTRACKED`, `MISSING`, `NO-IMPORTANCE`, `SOFT-TARGET`); the Q2 and Q3 lists for the Eisenhower check; for `weekly` and `monthly`, each card's open This Week items and Upcoming Milestones (your own person section on shared cards) plus the frontmatter the table does not already show; done items and Start Here are left out, and quiet cards get blockers and milestones only (`lookup` prints any card in full); in `daily` only the focus candidates (top 8, RED/YELLOW/overdue, waits, queues, awarded/report-due/resume-passed) get those bodies, minus Milestones, Q2 and blocked cards get frontmatter only, and the rest are listed by name (use `lookup` for one); queue rows; cross-person waits; "changed since you last looked"; the unread mail count; calendar events, pending notes and the idea count; and a Data problems list (missing folders, untracked projects, over-budget cards, conflict copies, legacy cards). Under a second for forty cards.
 
 - Pass `--store` on `daily`, `weekly` and `monthly` runs so the shared-card fingerprints are saved for the next "changed since you last looked" line, and on `mail` so the entries it prints are marked read. Never on any other run.
 - Do not re-read cards the sheet already covers. Open a card only when the sheet flags a problem on it, when the user asks about one project, or when you are about to write to it (`update`, `add`, `review`, `mail send`), and then re-read it immediately before the write.
@@ -202,6 +202,8 @@ Sort active projects by deadline pressure, then priority field:
   - 0.7–0.99 → YELLOW (tight but achievable)
   - < 0.7 → GREEN (on track)
 
+**Deadline without an hour estimate** (pressure `n/a`): no ratio can be computed, but the clock still counts. Sort it by days left: 7 or fewer with RED, 30 or fewer with YELLOW, later with GREEN. Keep the `n/a` label and say the estimate is missing.
+
 **Priority field order:** critical > high > medium > low
 
 **Blocking others:** If `blocking_others` is set (not null), the project is treated as one priority level higher than its stated `priority` field for sorting and display purposes. Mark it with a `[BLOCKING]` badge in all views so the user can see at a glance that someone is waiting on them. This overrides deadline pressure ordering only when two projects are otherwise tied.
@@ -239,48 +241,7 @@ Deadline pressure (above) is a measure of **urgency** — how soon does the cloc
 ## View Formats
 
 ### Daily View
-Punchy. 5 minutes to review.
-
-```
-## Today — [Day, Date]
-
-**Available today:** [Xh] (after [standing blocks / events if any])
-[If disruption in effect: "Adjusted: Xh remaining as of [time]"]
-
-**Urgent:** [RED projects — name, days until deadline]
-
-**Focus today:**
-1. [Project] — [specific task]
-2. [Project] — [specific task]
-3. [Project] — [specific task, max 4]
-
-**Important, not urgent (don't let this slide):** [importance: high projects with GREEN/no-deadline pressure, especially any stale 2+ weeks or absent from Focus above]
-[Omit this line entirely if none qualify]
-
-**Exploratory slot:** [project/topic] — [~Xh]
-[Omit if RED or YELLOW conflicts consume available time]
-
-**Blocked:** [project] — [blocker]
-
-**Waiting on you / you're waiting on:** [shared cards only — cross-person waits, e.g. "ben is waiting on you for the coding rules"]
-[Omit if none]
-
-**Changed since you last looked:** [shared cards only — "[Project]: ben updated their section (data pull landed)"]
-[Omit if none]
-
-**Mail:** [N unread across shared projects — `/bob mail` to read]
-[Omit if none]
-
-**Conflict copies:** [card conflict copies found, with filenames]
-[Omit if none]
-
-**Idea backlog:** [N idea(s) available — `/bob ideas` to review]
-[Omit this line if future-projects.md has no entries]
-```
-
-On a shared card, Focus and This Week come from the user's own person section only. Never list another person's tasks as the user's work. Their tasks show up only through the waits line.
-
-If registry is empty: skip the view, prompt the user to run `/bob add`.
+Defined in `~/.claude/skills/bob/daily-view.md` (template, rules and procedure), so the main session and this agent follow one copy. `/bob daily` normally runs in the main session without dispatching you; when you do build a daily, read that file first and follow it.
 
 ### Weekly View (Planning Conference)
 Substantive. Designed for Friday or Monday morning. Run the full sequence below.
@@ -371,7 +332,7 @@ Write confirmed answers to Horizon Notes in calendar.md.
 ## Modes
 
 ### daily
-Run `collect.R daily --store`, then the Daily View from its sheet. Invite reaction.
+Read `~/.claude/skills/bob/daily-view.md` and follow it: run `collect.R daily --store`, write the Daily View from its sheet, invite reaction.
 
 ### weekly
 Run `collect.R weekly --store`, then the full Weekly View sequence (Steps 1–5). This is the Friday planning conference — don't rush it.

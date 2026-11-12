@@ -11,7 +11,8 @@ Built for an academic workload: grants with phases, papers with venues, data res
 
 | Piece | Path | Role |
 |-------|------|------|
-| Skill | `skills/bob/SKILL.md` | The `/bob` command. Parses the mode and dispatches the agent. |
+| Skill | `skills/bob/SKILL.md` | The `/bob` command. Parses the mode and dispatches the agent; runs `daily` and `go` itself. |
+| Daily view | `skills/bob/daily-view.md` | The daily briefing: procedure, template and rules. Read by the main session, which writes the daily without starting the agent. |
 | Agent | `agents/bob.md` | All the logic: priority formula, views, modes, the bob.md contract. |
 | Collector | `skills/bob/collect.R` | Reads every card in one pass and prints the facts sheet the agent builds each view from. Base R, no packages. |
 | Templates | `skills/bob/templates/*.md` | Starter `bob.md` for six project types: research, grant, writing, admin, web, exploratory. |
@@ -64,7 +65,7 @@ Solo cards need nothing new beyond the `card_schema: bob/2` tag.
 
 ## Modes
 
-Every view starts with one run of `skills/bob/collect.R`, which reads all the cards, the calendar, the mailboxes and the read-state files and prints a single facts sheet: availability, every project sorted by deadline pressure with staleness, quadrant and badges, the body sections the view quotes, cross-person waits, unread mail and a list of data problems. The agent writes the view from that sheet and opens an individual card only to fix something or write to it. Forty cards take under a second.
+Every view starts with one run of `skills/bob/collect.R`, which reads all the cards, the calendar, the mailboxes and the read-state files and prints a single facts sheet: availability, every project sorted by deadline pressure with staleness, quadrant and badges, the body sections the view quotes, cross-person waits, unread mail and a list of data problems. The agent writes the view from that sheet and opens an individual card only to fix something or write to it. The daily sheet is trimmed to the cards that can make today's list, so it comes back in one tool result. Forty cards take under a second.
 
 | Command | What happens |
 |---------|--------------|

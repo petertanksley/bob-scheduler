@@ -362,6 +362,9 @@ projects <- lapply(seq_len(nrow(registry)), function(i) read_project(registry[i,
 rank_of <- function(p) {
   if (!isTRUE(p$exists) || is.na(p$card)) return(c(9, 9, 9, 9, 9e9))
   pr <- match(p$pressure, c("OVERDUE", "DUE-TODAY", "RED", "YELLOW", "GREEN", "none", "n/a")); pr <- nz(pr, 7)
+  # A deadline whose effort is not in hours (n/a) still has a clock: rank it by days left
+  # (<= 7d with RED, <= 30d with YELLOW, later with GREEN) instead of below every "none".
+  if (identical(p$pressure, "n/a") && !is.na(p$days)) pr <- if (p$days <= 7) 3 else if (p$days <= 30) 4 else 5
   st <- if (p$status == "active") 0 else if (p$status == "paused") 2 else 1
   pri <- nz(PRI[p$priority], 4); if ("BLOCKING" %in% p$badges) pri <- pri - 1
   ex <- if (p$type == "exploratory") 1 else 0
@@ -464,6 +467,23 @@ cat("- Standing blocks: -", round(blocked, 1), "h", if (length(blocks)) paste0("
 cat("- Events in window: -", ev_hours, "h", if (length(ev_in)) paste0("\n  - ", paste(ev_in, collapse = "\n  - ")) else " (none)", "\n", sep = "")
 cat("- **Available: ", round(available, 1), "h**\n\n", sep = "")
 
+# ---- Daily tiers ----------------------------------------------------------------------
+# The daily sheet must stay small enough to be read in one tool result (well under 30 KB):
+# all 49 cards verbatim was 130 KB. "full" = can reach Focus (This Week printed);
+# "brief" = Q2 / blocked, one line in the view (blockers only); "skip" = named at the end.
+DAILY_TOP <- 8; DAILY_DAYS <- 14
+daily_tier <- function(i, p) {
+  if (i <= DAILY_TOP || p$pressure %in% c("OVERDUE", "DUE-TODAY", "RED", "YELLOW") ||
+      length(p$cross_waits) > 0 || isTRUE(p$queue) ||
+      any(c("AWARDED-needs-setup", "REPORT-DUE", "RESUME-PASSED") %in% p$badges) ||
+      (!is.na(p$days) && p$days <= DAILY_DAYS) || any(grepl("^SOFT-TARGET", p$badges)) ||   # near deadline even when pressure is n/a
+      (p$status == "active" && p$priority %in% c("critical", "high"))) return("full")
+  if (identical(p$quadrant, "Q2 important-not-urgent") || any(c("BLOCKED", "BLOCKING") %in% p$badges)) return("brief")
+  "skip"
+}
+tier_of <- function(i, p) if (MODE == "daily") daily_tier(i, p) else "full"
+clip <- function(x, n = 200) ifelse(nchar(x) > n, paste0(substr(x, 1, n - 1), "\u2026"), x)
+
 tbl_row <- function(i, p) {
   if (!isTRUE(p$exists) || is.na(p$card)) return(paste0("| ", i, " | ", p$name, " | | | | | | | | | | ", paste(p$badges, collapse = " "), " |"))
   dl <- if (!is.na(p$deadline)) paste0(fmt_date(p$deadline), " (", p$days, "d)") else ""
@@ -476,15 +496,16 @@ tbl_row <- function(i, p) {
 }
 if (!MODE %in% c("mail", "lookup")) {
   cat("## Projects (sorted: active first, then pressure, priority, deadline; excluded grants last)\n\n")
-  cat("Pressure = (effort_h / weekly_h) / (days / 7): RED >= 1, YELLOW 0.7-0.99, GREEN < 0.7; none = no hard deadline; n/a = effort not estimated in hours; a 0h weekly with a deadline is RED. ",
+  cat("Pressure = (effort_h / weekly_h) / (days / 7): RED >= 1, YELLOW 0.7-0.99, GREEN < 0.7; none = no hard deadline; n/a = effort not estimated in hours; a 0h weekly with a deadline is RED. An n/a card with a deadline sorts by days left (<= 7d with RED, <= 30d with YELLOW, else GREEN). ",
       "Effort/Weekly are parsed hours (? = text that gave no hours; see the detail block for the wording). Stale = days since (your) last_updated. Phase text truncated.\n\n")
   cat("| # | Project | Type | Status / phase | Pri | Imp | Pressure | Deadline (days) | Soft target | Effort | Weekly | Stale | Badges |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|\n")
-  for (i in seq_along(projects)) cat(tbl_row(i, projects[[i]]), "\n", sep = "")
+  for (i in seq_along(projects)) if (tier_of(i, projects[[i]]) != "skip") cat(tbl_row(i, projects[[i]]), "\n", sep = "")
+  if (MODE == "daily") cat("\n(daily: quiet cards are left out of this table and named under \"Details omitted\")\n")
   cat("\n")
 }
 
 q2 <- Filter(function(p) isTRUE(p$exists) && !is.na(p$card) && !isTRUE(p$excluded) && p$quadrant == "Q2 important-not-urgent", projects)
-if (length(q2)) { cat("## Important, not urgent (Q2 check)\n"); for (p in q2) cat("- ", p$name, ": importance high, pressure ", p$pressure, ", stale ", nz(p$stale_days, "?"), "d, weekly ", nz(p$weekly_raw, "?"), if (nz(p$stale_days, 0) >= 14) "  <-- stale 2+ weeks" else "", "\n", sep = ""); cat("\n") }
+if (length(q2)) { cat("## Important, not urgent (Q2 check)\n"); for (p in q2) cat("- ", p$name, ": importance high, pressure ", p$pressure, ", stale ", nz(p$stale_days, "?"), "d, weekly ", clip(nz(p$weekly_raw, "?"), if (MODE == "daily") 40 else 9999), if (nz(p$stale_days, 0) >= 14) "  <-- stale 2+ weeks" else "", "\n", sep = ""); cat("\n") }
 q3 <- Filter(function(p) isTRUE(p$exists) && !is.na(p$card) && p$quadrant == "Q3 urgent-not-important", projects)
 if (length(q3)) { cat("## Urgent, not important (annotate, do not hide)\n"); for (p in q3) cat("- ", p$name, ": importance ", p$importance, ", pressure ", p$pressure, "\n", sep = ""); cat("\n") }
 
@@ -501,7 +522,7 @@ queue_rows_out <- function(p) {
   cat("\n")
 }
 
-detail <- function(i, p, full = FALSE) {
+detail <- function(i, p, full = FALSE, brief = FALSE) {
   cat("## [", i, "] ", p$name, "\n", sep = "")
   cat("Path: ", p$path, if (!is.na(p$card)) paste0("  |  Card: ", basename(p$card), " (", p$n_lines, " lines)") else "", "\n", sep = "")
   if (!isTRUE(p$exists) || is.na(p$card)) { cat("Problems: ", paste(p$problems, collapse = "; "), "\n\n", sep = ""); return(invisible()) }
@@ -518,20 +539,84 @@ detail <- function(i, p, full = FALSE) {
   if (length(p$note) && nzchar(p$note)) cat("- registry note: ", p$note, "\n", sep = "")
   if (length(p$problems)) cat("- PROBLEMS: ", paste(p$problems, collapse = "; "), "\n", sep = "")
   if (isTRUE(p$queue)) { cat("\n"); queue_rows_out(p) }
+  if (brief) { cat("(body omitted in daily: Q2/blocked line only)\n\n"); return(invisible()) }
   if (full) { cat("\n```\n", paste(p$lines, collapse = "\n"), "\n```\n\n", sep = ""); return(invisible()) }
   if (isTRUE(p$shared)) {
     if (length(p$my_section)) cat("\n", paste(p$my_section, collapse = "\n"), "\n", sep = "") else cat("\n(no ## Person: ", ME, " section)\n", sep = "")
-    if (length(p$milestones)) cat("\n", paste(p$milestones, collapse = "\n"), "\n", sep = "")
+    if (length(p$milestones) && MODE != "daily") cat("\n", paste(p$milestones, collapse = "\n"), "\n", sep = "")
     if (length(p$cross_waits)) cat("\nCross-person waits:\n", paste0("- ", p$cross_waits, collapse = "\n"), "\n", sep = "")
   } else {
-    for (s in list(p$this_week, p$start_here, p$milestones)) if (length(s)) cat("\n", paste(s, collapse = "\n"), "\n", sep = "")
+    for (s in list(p$this_week, p$start_here, if (MODE != "daily") p$milestones)) if (length(s)) cat("\n", paste(s, collapse = "\n"), "\n", sep = "")
   }
   cat("\n")
 }
 
+# Weekly / monthly detail. The table already carries status, priority, importance, dates,
+# parsed hours, staleness and badges, so the block prints only what it lacks, and leaves out
+# what planning does not use: done items and Start Here (session-resume notes; `lookup`
+# prints a card in full). Quiet cards (the ones daily only names) get blockers + milestones.
+not_done <- function(x) x[!grepl("^\\s*[-*] \\[[xX]\\]", x)]
+detail_plan <- function(i, p) {
+  quiet <- daily_tier(i, p) == "skip"
+  cat("## [", i, "] ", p$name, if (quiet) "  (quiet: blockers + milestones only)" else "", "\n", sep = "")
+  if (!isTRUE(p$exists) || is.na(p$card)) { cat("Problems: ", paste(p$problems, collapse = "; "), "\n\n", sep = ""); return(invisible()) }
+  keys <- c("effort_remaining", "weekly_commitment", "resume_date", "blockers", "blocking_others", "waiting_on",
+            "funder", "mechanism", "submission_deadline", "award_date", "project_start", "project_end", "budget_period_end", "next_report_due", "total_budget")
+  for (k in keys) {
+    v <- show(p$fm, k); if (is.null(v)) next
+    if (k %in% c("effort_remaining", "weekly_commitment") && nchar(v) <= 12) next   # a bare number: the table has it
+    cat("- ", k, ": ", clip(v, 300), "\n", sep = "")
+  }
+  cat("- computed: deadline from ", p$deadline_src, if (!is.na(p$ratio) && is.finite(p$ratio)) paste0("; ratio ", round(p$ratio, 2)) else "", "; quadrant ", p$quadrant, "\n", sep = "")
+  if (length(p$note) && nzchar(p$note)) cat("- registry note: ", p$note, "\n", sep = "")
+  if (length(p$problems)) cat("- PROBLEMS: ", paste(p$problems, collapse = "; "), "\n", sep = "")
+  if (isTRUE(p$queue)) { cat("\n"); queue_rows_out(p) }
+  out <- function(x) if (length(x)) cat("\n", paste(x, collapse = "\n"), "\n", sep = "")
+  if (isTRUE(p$shared)) {
+    if (!quiet) { if (length(p$my_section)) out(not_done(drop_subsections(p$my_section, "start here"))) else cat("\n(no ## Person: ", ME, " section)\n", sep = "") }
+    out(p$milestones)
+    if (length(p$cross_waits)) cat("\nCross-person waits:\n", paste0("- ", p$cross_waits, collapse = "\n"), "\n", sep = "")
+  } else {
+    if (!quiet) { tw <- not_done(p$this_week); out(if (sum(nzchar(trim(tw))) > 1) tw else p$start_here) }   # no task list: fall back to Start Here
+    out(p$milestones)
+  }
+  cat("\n")
+}
+
+# Daily detail: the table already carries status, priority, pressure, dates, hours and badges,
+# so print only what it lacks: blockers/waits, unparsed effort wording, queue rows, This Week.
+drop_subsections <- function(lines, pat) {
+  out <- character(); skip <- FALSE
+  for (ln in lines) { if (grepl("^#{2,4} ", ln)) skip <- grepl(pat, ln, ignore.case = TRUE); if (!skip) out <- c(out, ln) }
+  out
+}
+detail_daily <- function(i, p, brief) {
+  cat("## [", i, "] ", p$name, if (brief) "  (brief)" else "", "\n", sep = "")
+  if (!isTRUE(p$exists) || is.na(p$card)) { cat("Problems: ", paste(p$problems, collapse = "; "), "\n\n", sep = ""); return(invisible()) }
+  for (k in c("blockers", "blocking_others", "waiting_on")) { v <- show(p$fm, k); if (!is.null(v)) cat("- ", k, ": ", clip(v, 220), "\n", sep = "") }
+  if (is.na(p$effort_h) && !is.na(p$days)) cat("- effort_remaining (no hours parsed): ", clip(nz(p$effort_raw, "?"), 120), "\n", sep = "")
+  if (length(p$problems)) cat("- PROBLEMS: ", paste(p$problems, collapse = "; "), "\n", sep = "")
+  if (isTRUE(p$queue)) { cat("\n"); queue_rows_out(p) }
+  if (brief) { cat("\n"); return(invisible()) }
+  body <- if (isTRUE(p$shared)) drop_subsections(p$my_section, "start here|milestone") else p$this_week
+  body <- body[nzchar(trim(body)) & !grepl("^\\s*[-*] \\[[xX]\\]", body)]   # done items are not focus candidates
+  if (sum(grepl("^\\s*([-*]|[0-9]+\\.)\\s", body)) == 0 && !isTRUE(p$shared)) body <- p$start_here[nzchar(trim(p$start_here))]   # no task list: fall back
+  if (length(body) > 8) body <- c(body[1:8], paste0("(+", length(body) - 8, " more lines; lookup for the rest)"))
+  if (length(body)) cat(paste(clip(body, 160), collapse = "\n"), "\n", sep = "")
+  cat("\n")
+}
+
 if (MODE %in% c("daily", "weekly", "monthly")) {
-  cat("## Project details (same order; body sections verbatim)\n\n")
-  for (i in seq_along(projects)) { p <- projects[[i]]; if (isTRUE(p$excluded)) next; detail(i, p) }
+  cat("## Project details (same order", if (MODE == "daily") "; daily: This Week for focus candidates, blockers only for Q2/blocked" else "; open This Week items + milestones; no Start Here, no done items; `lookup` for a full card", ")\n\n", sep = "")
+  skipped <- character()
+  for (i in seq_along(projects)) {
+    p <- projects[[i]]; if (isTRUE(p$excluded)) next
+    tier <- tier_of(i, p)
+    if (tier == "skip") { skipped <- c(skipped, p$name); next }
+    if (MODE == "daily") detail_daily(i, p, tier == "brief") else detail_plan(i, p)
+  }
+  if (length(skipped)) cat("## Details omitted in daily (", length(skipped), " cards, table row only; `collect.R lookup <words>` for one)\n",
+                           paste0("- ", skipped, collapse = "\n"), "\n\n", sep = "")
 }
 if (MODE == "lookup") {
   if (!nzchar(QUERY)) { cat("lookup needs a query\n"); quit(status = 1) }
@@ -566,6 +651,7 @@ if (MODE == "weekly") {
 }
 
 cw <- unlist(lapply(projects, function(p) if (length(p$cross_waits)) paste0(p$name, " ", p$cross_waits)))
+if (MODE == "daily") cw <- clip(cw[!grepl("\\] - (none|n/a)\\.?$", cw, ignore.case = TRUE)], 210)
 if (length(cw)) cat("## Cross-person waits (shared cards)\n", paste0("- ", cw, collapse = "\n"), "\n\n", sep = "")
 if (length(changed)) cat("## Changed since you last looked\n", paste0("- ", changed, collapse = "\n"), "\n\n", sep = "")
 cat("## Mail\nUnread addressed to ", ME, "/", AGENT, "/all: ", n_unread, " (of ", mail_total, " addressed to you)", if (n_unread && MODE != "mail") "  -- `/bob mail` to read" else "", "\n", sep = "")

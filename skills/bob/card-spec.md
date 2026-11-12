@@ -140,6 +140,7 @@ Other people's tasks never appear as the user's work.
 ```
 
 - Append one line per entry. Never edit or reorder existing entries.
+- **Cadence: one condensed entry per sender per recipient, per session, written together with the card update at session end.** Decisions made during a session collect in the sender's own `## Person:` section; at session end they go out as a single entry carrying the final state, not the back-and-forth. No mid-session entries, so the mailbox doesn't fill with a dozen notes or flip-flop as decisions change. Exception: something a recipient must act on before the session ends (a same-day deadline).
 - `to:` is a comma list of person keys or agent names, or `all`. An entry is "mine" if `to:` contains my `me` key, my `agent` name, or `all`.
 - Read state is local: `~/.claude/bob/mail-seen.json` maps the mailbox's absolute path to the sha1 hashes of entry lines already read. Reading never writes to the shared folder.
 - The steward prunes entries older than ~90 days into `docs/logs/`.

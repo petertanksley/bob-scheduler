@@ -32,7 +32,7 @@ Parse `$ARGUMENTS` and pass the appropriate mode to the bob agent:
 
 | Arguments | Mode | What happens |
 |-----------|------|--------------|
-| (none) or `daily` | daily | Today's priority briefing |
+| (none) or `daily` | daily | Today's priority briefing (see **Daily** below; no agent) |
 | `weekly` | weekly | This week's planning conference |
 | `monthly` or `quarterly` | monthly | Long-horizon milestone review |
 | `add` | add | Register a new project interactively |
@@ -56,14 +56,14 @@ Parse `$ARGUMENTS` and pass the appropriate mode to the bob agent:
 
 0. **Pick the model first, unless one is already set.** If the user gave a model (a flag, or words like "on sonnet"), skip this step. Otherwise run `Rscript ~/.claude/skills/bob/go.R <project words> --suggest` (launches nothing; exit codes as in step 2). It prints the card's `type`, next tasks (Start Here, This Week), any card-level `model:` line, and the models the project's recent sessions ran on.
    - If the card has a `model:` line, use it without asking and say so in the reply.
-   - Otherwise ask once with AskUserQuestion (header "Model"): Fable, Opus, Sonnet, Haiku, with your recommendation first and marked "(Recommended)". Each option's description says in a few words what it suits; the recommended one also says why, citing the next task and what past sessions used ("next up is a read-through and three short attachments; the last session ran on Fable").
+   - Otherwise ask once with AskUserQuestion (header "Model"): Fable, Opus, Sonnet, Haiku, with your recommendation first and marked "(Recommended)". Each option's description says in a few words what it suits; the recommended one also says why, citing the next task and what past sessions used ("next up is filling CONFIRM flags and a read-through; the last session ran on Fable").
    - Base the recommendation on the **next task**, not the project's prestige: novel analysis design, hard debugging, causal or statistical reasoning, and drafting an argument from scratch lean Fable or Opus; routine drafting, edits, formatting, renders, file assembly and status updates lean Sonnet; lookups and mechanical chores lean Haiku. Past sessions are evidence of habit, not of need: if every session ran on the top model but the next task is routine, recommend down and say so.
    - Then run step 1 with the chosen `--model`. If the user says "always use this here", add `model: <alias>` to the card's frontmatter so later launches skip the question.
 1. Run `Rscript ~/.claude/skills/bob/go.R <project words> [flags]`. It matches the Active sections of both registries (folder name first, then display name) and **copies** `cd <path> && claude "<orientation prompt>"` to the clipboard. The user opens a new terminal in the VS Code terminal panel (`` Ctrl+Shift+` ``; it joins the panel's tab list, on the right), pastes, and presses Enter. Leave `terminal.integrated.defaultLocation` at its default: setting it to `"editor"` opens the new terminal in the editor area, so two sessions show at once. One window, and the new session reads bob.md and gives a five-line pickup. Nothing outside VS Code can open a tab in an existing window, and a Claude panel tab always runs in its window's first folder, so the paste is the one manual step.
    - `--window`: open the folder in its own VS Code window, wait 4 s, then open `vscode://anthropic.claude-code/open?prompt=…` to start a Claude panel there.
    - `--terminal`: open a new Terminal.app window running the command.
    - `--bare`: no orientation prompt.
-   - `--model <alias>` (also `--model=<alias>`, or `--fable` / `--opus` / `--sonnet` / `--haiku`): start the new session on that model, so the choice is made up front and not midstream. Pass through whatever the user gives, including plain words ("go thesis on sonnet" → `--sonnet`). With no flag, `go.R` uses a `model:` line in the project card's frontmatter if there is one, else the session default. It prints the model and where it came from; repeat that in the one-line reply. Not available with `--window`.
+   - `--model <alias>` (also `--model=<alias>`, or `--fable` / `--opus` / `--sonnet` / `--haiku`): start the new session on that model, so the choice is made up front and not midstream. Pass through whatever the user gives, including plain words ("go afsp on sonnet" → `--sonnet`). With no flag, `go.R` uses a `model:` line in the project card's frontmatter if there is one, else the session default. It prints the model and where it came from; repeat that in the one-line reply. Not available with `--window`.
 2. Exit codes:
    - `0`: done. Default mode: reply in one line with the project name and "copied: `` Ctrl+Shift+` ``, `Cmd+V`, Enter". With a flag: the project name and that the new window is open. Either way, suggest closing this session (or `/clear` if it is the hub session).
    - `2`: ambiguous. Stdout lists `name<TAB>path`, one per line. Ask the user which (AskUserQuestion, up to 4 options; if there are more, list them and ask for a more specific name), then rerun with the chosen **absolute path** as the argument.
@@ -72,9 +72,17 @@ Parse `$ARGUMENTS` and pass the appropriate mode to the bob agent:
 
 ---
 
+## Daily
+
+`/bob` and `/bob daily` run **here in the main session**; do not dispatch the bob agent. Read `~/.claude/skills/bob/daily-view.md` and follow it: one `collect.R daily --store` run, then the Daily View written from its facts sheet. The agent's cold start, its 43 KB instructions and the relay of its report back through this session were most of the wait.
+
+The daily path only reads. If the user's reaction calls for a write (card, registry, calendar, mail), dispatch the agent in the matching mode as below.
+
+---
+
 ## Dispatch
 
-For every mode except `go`, dispatch the `bob` agent with the following context:
+For every mode except `go` and `daily`, dispatch the `bob` agent with the following context:
 
 ```
 Mode: [parsed mode from argument table above]

@@ -1,5 +1,14 @@
 # Changelog
 
+## v2026.11.12: faster daily, smaller facts sheets
+
+- **`/bob daily` runs in the main session.** No agent is dispatched for the daily briefing: the session reads `skills/bob/daily-view.md`, runs `collect.R daily --store` once, and writes the view. The agent's cold start, its long instructions and the relay of its report were most of the wait. The daily path only reads; anything that changes a card, the registry or the calendar still goes to the agent.
+- **`skills/bob/daily-view.md`.** The Daily View (procedure, template and the rules it depends on) lives in one file that the skill and the agent both point to.
+- **Daily facts sheet cut to about a fifth.** A tool result over roughly 30 KB is saved to a file and read back in pieces, so a large sheet cost several extra turns. In `daily` mode the collector now prints open This Week items only for cards that can reach Focus (top of the sort, anything urgent or due within 14 days, high or critical priority, waits, queues), blockers only for important-not-urgent and blocked cards, and names the rest. Done items, Start Here and milestones are left out, and long lines are clipped.
+- **Weekly and monthly sheets cut to about half.** Frontmatter is limited to what the table does not already show, done items and Start Here are left out, and quiet cards print blockers and milestones only. `/bob <project>` still prints a card in full.
+- **Sort fix.** A card with a deadline but no hour estimate (pressure `n/a`) used to sort below every card with no deadline at all. It now ranks by days left: 7 or fewer with RED, 30 or fewer with YELLOW, later with GREEN.
+- `card-spec.md`: mailbox cadence rule (one condensed entry per recipient per session, written at session end).
+
 ## v2026.11.10: `/bob go` picks the model
 
 - **Model at launch.** `/bob go <project> --model <alias>` (or `--fable`, `--opus`, `--sonnet`, `--haiku`) adds `--model` to the copied launch command, so a session starts on the right model and never switches midstream. Not available with `--window`, whose VS Code link cannot carry a model.
