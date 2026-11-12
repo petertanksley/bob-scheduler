@@ -56,7 +56,7 @@ is_null <- function(x) is.null(x) || is.na(x) || !nzchar(x) || tolower(x) %in% c
 first_date <- function(x) { if (is_null(x)) return(as.Date(NA)); m <- regmatches(x, regexec("^\\s*[-~]?\\s*(\\d{4}-\\d{2}-\\d{2})", x))[[1]]; if (length(m) == 2) as.Date(m[2]) else as.Date(NA) }
 any_date <- function(x) { if (is_null(x)) return(as.Date(NA)); m <- regmatches(x, regexpr("\\d{4}-\\d{2}-\\d{2}", x)); if (length(m)) as.Date(m) else as.Date(NA) }
 fmt_date <- function(d) if (is.na(d)) "" else format(d, "%Y-%m-%d")
-nz <- function(x, alt = "") if (is.null(x) || length(x) == 0 || is.na(x)) alt else x
+nz <- function(x, alt = "") if (is.null(x) || length(x) == 0 || (length(x) == 1 && is.na(x))) alt else x
 val <- function(fm, k) { v <- fm$fields[[k]]; if (is.null(v)) NA_character_ else v }
 show <- function(fm, k) { v <- fm$raw[[k]]; if (is.null(v) || is_null(strip_comment(v))) NULL else v }
 

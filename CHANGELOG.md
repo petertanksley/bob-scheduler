@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **Collector crash fix.** `collect.R` halted in every mode (`'length = 8' in coercion to 'logical(1)'`, from `nz`) once a mailbox had two or more entries marked read in `~/.claude/bob/mail-seen.json`, which is what `/bob mail` writes. `nz()` now accepts a vector. If you are already stuck, pull, re-run `./install.sh`, and Bob reads the existing file fine; nothing needs deleting.
+
 ## v2026.11.12: faster daily, smaller facts sheets
 
 - **`/bob daily` runs in the main session.** No agent is dispatched for the daily briefing: the session reads `skills/bob/daily-view.md`, runs `collect.R daily --store` once, and writes the view. The agent's cold start, its long instructions and the relay of its report were most of the wait. The daily path only reads; anything that changes a card, the registry or the calendar still goes to the agent.
