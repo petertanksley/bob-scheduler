@@ -34,7 +34,7 @@ last_updated: 2026-10-16
 ---
 ```
 
-Optional: `model: <alias>` (for example `sonnet`) sets the model `/bob go` starts this project's sessions on, so the launch skips its model question. A `--model` flag on the command overrides it.
+Optional: `model: <alias>` (for example `sonnet`) sets the model `/bob go` starts this project's sessions on, so the launch skips its model question. A `--model` flag on the command overrides it. Optional: `advisor: <alias>` (for example `fable`) pairs that model with a stronger advisor on launch (Claude Code's experimental advisor); `--advisor <alias>` overrides it and `--advisor off` skips it.
 
 Optional: `maintained_by: <key>` names the person who keeps a solo card. The session-start detect hook reports it, so an agent opening an unfamiliar folder knows whose card it is reading.
 

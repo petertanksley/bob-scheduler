@@ -1,7 +1,9 @@
 # Changelog
 
-## Unreleased
+## v2026.11.12.1: advisor at launch, shared cards in `/bob go`, collector crash fix
 
+- **Advisor at launch (experimental).** `/bob go <project> --advisor <alias>` pairs the session model with a stronger advisor it can consult mid-task (Claude Code's experimental advisor), for example `--sonnet --advisor fable`. An optional `advisor:` line in a card's frontmatter does the same without the flag; `--advisor off` skips it. When Bob asks which model to use it may offer one pairing, only for work that is mostly routine with a few judgment points. Advisor tokens are billed on top of the main model's and no savings have been measured. Not available with `--window`. Documented in `SKILL.md` and `card-spec.md`.
+- **`/bob go` finds shared cards.** `go.R` only looked for `bob.md`, so a project whose card is another root `.md` tagged `card_schema: bob/2` (a shared card named after another agent) showed no card, no next tasks and no card-level `model:`. It now locates the card by the collector's rule, reads your own `## Person:` section on a shared card, and names the card in the orientation prompt.
 - **Collector crash fix.** `collect.R` halted in every mode (`'length = 8' in coercion to 'logical(1)'`, from `nz`) once a mailbox had two or more entries marked read in `~/.claude/bob/mail-seen.json`, which is what `/bob mail` writes. `nz()` now accepts a vector. If you are already stuck, pull, re-run `./install.sh`, and Bob reads the existing file fine; nothing needs deleting.
 
 ## v2026.11.12: faster daily, smaller facts sheets

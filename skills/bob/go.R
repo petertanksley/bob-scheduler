@@ -6,7 +6,8 @@
 # Matches the query against the Active sections of ~/.claude/bob/registry.md and
 # registry-local.md (folder name first, then display name), then copies
 # `cd <path> && claude "<orientation prompt>"` to the clipboard for pasting into a
-# new VS Code terminal tab. A session launched in the project loads its CLAUDE.md,
+# new VS Code terminal tab. The project's status card is bob.md or any root .md
+# tagged `card_schema: bob/<n>`; the prompt names whichever it finds. A session launched in the project loads its CLAUDE.md,
 # memory and history, which a mid-session cd cannot do.
 #
 #   --window   open the folder in its own VS Code window with a Claude panel instead
@@ -18,6 +19,12 @@
 #              start the session on that model. With no flag, a `model:` line in
 #              the project card's frontmatter is used; with neither, the default.
 #              Not available with --window (the VS Code URI cannot carry a model).
+#   --advisor <alias> (or --advisor=<alias>)
+#              pair the session's model with a stronger advisor model it can consult
+#              mid-task (Claude Code's experimental advisor; the launch command gets
+#              `--advisor <alias>`). With no flag, an `advisor:` line in the card's
+#              frontmatter is used. `--advisor off` launches without one even if the
+#              card names one. Not available with --window.
 #
 # Exit codes: 0 launched (or dry run), 1 no match / bad path, 2 ambiguous
 # (candidates printed one per line as "name<TAB>path").
@@ -49,10 +56,29 @@ if (nzchar(model) && !grepl("^[][A-Za-z0-9._-]+$", model)) {
   quit(status = 1)
 }
 
+# ---- Advisor ------------------------------------------------------------------
+# --advisor <alias> or --advisor=<alias>; "off" (or "none") means no advisor, card or not.
+advisor <- ""
+i <- which(args == "--advisor")
+if (length(i) > 0 && i[1] < length(args)) {
+  advisor <- args[i[1] + 1]
+  args    <- args[-c(i[1], i[1] + 1)]
+}
+eq <- grep("^--advisor=", args)
+if (length(eq) > 0) {
+  advisor <- sub("^--advisor=", "", args[eq[1]])
+  args    <- args[-eq]
+}
+if (nzchar(advisor) && !grepl("^[][A-Za-z0-9._-]+$", advisor)) {
+  cat(sprintf("Not a usable advisor model name: '%s'\n", advisor))
+  quit(status = 1)
+}
+advisor_off <- tolower(advisor) %in% c("off", "none")
+
 flags <- args[startsWith(args, "--")]
 query <- trimws(paste(args[!startsWith(args, "--")], collapse = " "))
 if (!nzchar(query)) {
-  cat("usage: go.R <project> [--vscode] [--bare] [--dry-run]\n")
+  cat("usage: go.R <project> [--model <alias>] [--advisor <alias>|off] [--window | --terminal] [--bare] [--dry-run]\n")
   quit(status = 1)
 }
 
@@ -111,6 +137,42 @@ if (!dir.exists(hit$path)) {
   quit(status = 1)
 }
 
+# ---- Card ---------------------------------------------------------------------
+# The status card is bob.md, or any root-level .md whose frontmatter carries
+# `card_schema: bob/<n>` (shared cards are often named after another agent). Same rule
+# as collect.R and hooks/bob_card.py: bob.md first, then tagged files by name; README,
+# CLAUDE, MEMORY, CHANGELOG, LICENSE and sync conflict copies are never cards.
+frontmatter <- function(lines) {
+  d <- which(trimws(lines) == "---")
+  if (length(d) >= 2 && d[1] == 1) lines[seq_len(d[2])[-1][-(d[2] - 1)]] else character()
+}
+find_card <- function(dir) {
+  bob <- file.path(dir, "bob.md")
+  if (file.exists(bob)) return(bob)
+  mds <- sort(list.files(dir, pattern = "\\.md$", full.names = TRUE))
+  mds <- mds[!tolower(basename(mds)) %in% c("readme.md", "claude.md", "memory.md", "changelog.md", "license.md")]
+  mds <- mds[!grepl("\\s\\(.+\\)$|-[A-Za-z0-9]+-\\d+$|\\s\\d+$", sub("\\.md$", "", basename(mds)), perl = TRUE)]
+  for (f in mds) if (any(grepl("^card_schema:\\s*bob/", frontmatter(readLines(f, n = 200, warn = FALSE))))) return(f)
+  ""
+}
+card <- find_card(hit$path)
+card_lines <- if (nzchar(card)) readLines(card, warn = FALSE) else character()
+card_fm    <- frontmatter(card_lines)
+fm_value   <- function(key) {   # first `key: <alias>` in the frontmatter, "" if none
+  m <- regmatches(card_fm, regexec(paste0("^", key, ":\\s*([][A-Za-z0-9._-]+)"), card_fm))
+  m <- Filter(function(v) length(v) == 2, m)
+  if (length(m)) m[[1]][2] else ""
+}
+# On a shared card the user's tasks sit under `## Person: <me>`; `me` comes from identity.md.
+me <- ""
+idf <- path.expand("~/.claude/bob/identity.md")
+if (file.exists(idf)) {
+  m <- regmatches(readLines(idf, warn = FALSE), regexec("^me:\\s*([A-Za-z0-9._-]+)", readLines(idf, warn = FALSE)))
+  m <- Filter(function(v) length(v) == 2, m); if (length(m)) me <- m[[1]][2]
+}
+my_start <- if (nzchar(me)) grep(paste0("^## Person:\\s*", me, "\\s*$"), card_lines, ignore.case = TRUE) else integer()
+shared   <- length(my_start) > 0
+
 # ---- Suggest ------------------------------------------------------------------
 # --suggest: print what the caller needs to recommend a model, then exit without
 # launching: the card's type/status/deadline and next tasks, and which models the
@@ -118,22 +180,28 @@ if (!dir.exists(hit$path)) {
 
 if ("--suggest" %in% flags) {
   cat(sprintf("%s\n%s\n", hit$name, hit$path))
-  card <- file.path(hit$path, "bob.md")
-  if (file.exists(card)) {
-    cl <- readLines(card, warn = FALSE)
-    fm <- grep("^(type|status|priority|deadline|target|effort_remaining|model):", cl, value = TRUE)
-    cat("-- card\n"); cat(substr(fm, 1, 160), sep = "\n")
+  if (nzchar(card)) {
+    fm <- grep("^(type|status|phase|priority|deadline|target|effort_remaining|model|advisor):", card_fm, value = TRUE)
+    cat(sprintf("-- card: %s%s\n", basename(card), if (shared) sprintf(" (shared; section ## Person: %s)", me) else ""))
+    cat(substr(fm, 1, 160), sep = "\n")
+    # Solo card: `## <title>` sections. Shared card: `### <title>` inside the user's person section.
+    cl <- card_lines; lvl <- "## "
+    if (shared) {
+      rest <- cl[(my_start[1] + 1):length(cl)]
+      nxt  <- grep("^## ", rest)
+      cl   <- rest[seq_len(if (length(nxt)) nxt[1] - 1 else length(rest))]; lvl <- "### "
+    }
     sect <- function(title, n) {
-      a <- grep(paste0("^## ", title), cl)
-      if (length(a) == 0) return(invisible())
+      a <- grep(paste0("^", lvl, title), cl)
+      if (length(a) == 0 || a[1] == length(cl)) return(invisible())
       rest <- cl[(a[1] + 1):length(cl)]
-      b <- grep("^## ", rest)
+      b <- grep("^#{2,3} ", rest)
       body <- rest[seq_len(if (length(b)) b[1] - 1 else length(rest))]
-      body <- body[nzchar(trimws(body))]
+      body <- body[nzchar(trimws(body)) & !grepl("^\\s*[-*] \\[[xX]\\]|^\\s*<!--", body)]
       cat(sprintf("-- %s\n", title)); cat(substr(head(body, n), 1, 200), sep = "\n")
     }
-    sect("Start Here Next Session", 6); sect("This Week", 8)
-  } else cat("-- card: none\n")
+    sect("Start Here", 6); sect("This Week", 8)
+  } else cat("-- card: none (no bob.md and no .md tagged card_schema: bob/2 in the project root)\n")
   slug <- gsub("[^A-Za-z0-9]", "-", normalizePath(hit$path, mustWork = FALSE))
   sdir <- file.path(path.expand("~/.claude/projects"), slug)
   logs <- if (dir.exists(sdir)) list.files(sdir, pattern = "\\.jsonl$", full.names = TRUE) else character()
@@ -154,26 +222,31 @@ if ("--suggest" %in% flags) {
 
 # ---- Launch -------------------------------------------------------------------
 
-orient <- paste("Orient me: read this project's bob.md (Start Here Next Session,",
-                "This Week, blockers) and any recent docs/logs entry, then give a",
-                "five-line pickup. Do not start work.")
+card_name <- if (nzchar(card)) basename(card) else "bob.md"
+orient <- paste0("Orient me: read this project's status card, ", card_name,
+                 if (shared) paste0(" (my section is ## Person: ", me, "; also the project block and who is waiting on whom)") else " (Start Here Next Session, This Week, blockers)",
+                 ", and any recent docs/logs entry, then give a five-line pickup. Do not start work.")
 claude_bin <- Sys.which("claude")
 if (!nzchar(claude_bin)) claude_bin <- "claude"
 
 # No model flag: fall back to a `model:` line in the project card's frontmatter, if it has one.
 model_src <- if (nzchar(model)) "flag" else ""
 if (!nzchar(model)) {
-  card <- file.path(hit$path, "bob.md")
-  if (file.exists(card)) {
-    top <- readLines(card, n = 40, warn = FALSE)
-    m   <- regmatches(top, regexec("^model:\\s*([][A-Za-z0-9._-]+)", top))
-    m   <- Filter(function(v) length(v) == 2, m)
-    if (length(m) > 0) { model <- m[[1]][2]; model_src <- "card" }
-  }
+  v <- fm_value("model")
+  if (nzchar(v)) { model <- v; model_src <- paste0("card ", card_name) }
+}
+
+# Same for the advisor: flag first, then an `advisor:` line on the card. "off" wins over the card.
+advisor_src <- if (nzchar(advisor)) "flag" else ""
+if (advisor_off) advisor <- ""
+if (!nzchar(advisor) && !advisor_off) {
+  v <- fm_value("advisor")
+  if (nzchar(v) && !tolower(v) %in% c("off", "none")) { advisor <- v; advisor_src <- paste0("card ", card_name) }
 }
 
 shell_cmd <- paste(c("cd", shQuote(hit$path), "&&", shQuote(claude_bin),
                      if (nzchar(model)) c("--model", shQuote(model)),
+                     if (nzchar(advisor)) c("--advisor", shQuote(advisor)),
                      if (!"--bare" %in% flags) shQuote(orient)), collapse = " ")
 
 if (!any(c("--window", "--terminal") %in% flags)) {
@@ -202,6 +275,12 @@ if (nzchar(model)) {
               if ("--window" %in% flags) " -- ignored: --window cannot set a model" else ""))
 } else {
   cat("model: session default\n")
+}
+if (nzchar(advisor)) {
+  cat(sprintf("advisor: %s (from %s)%s\n", advisor, advisor_src,
+              if ("--window" %in% flags) " -- ignored: --window cannot set an advisor" else ""))
+} else {
+  cat(sprintf("advisor: none%s\n", if (advisor_off) " (turned off by flag)" else ""))
 }
 if ("--dry-run" %in% flags) {
   cat(paste(cmd, collapse = " "), "\n")
